@@ -1,0 +1,17 @@
+Date,Ref ID,Type,Description,Client,Amount,Currency
+2026-10-30,TX-88290,Withdrawal,Withdrawal to HDFC Bank ****4521,,-810.00,USD
+2026-10-28,TX-88214,Service Fee,Service Fee for Milestone 2,Bloom & Co (Australia),-90.00,USD
+2026-10-28,TX-88213,Fixed Price,Milestone 2 - Shopify store redesign,Bloom & Co (Australia),900.00,USD
+2026-10-08,TX-87801,Fixed Price,Mobile app MVP - final milestone,Kestrel Health (USA),2400.00,USD
+2026-10-08,TX-87802,Service Fee,Service Fee for Fixed Price,Kestrel Health (USA),-240.00,USD
+2026-09-16,TX-87160,Withdrawal,Withdrawal to HDFC Bank ****4521,,-630.00,USD
+2026-09-14,TX-87103,Service Fee,Service Fee for Hourly Invoice,Nordwind GmbH (Germany),-70.00,USD
+2026-09-14,TX-87102,Hourly,Invoice for 20 hrs - React dashboard,Nordwind GmbH (Germany),700.00,USD
+2026-08-20,TX-86650,Fixed Price,Mobile app MVP - milestone 1,Kestrel Health (USA),2600.00,USD
+2026-08-20,TX-86651,Service Fee,Service Fee for Fixed Price,Kestrel Health (USA),-260.00,USD
+2026-07-11,TX-85902,Hourly,Invoice for 40 hrs - React dashboard,Nordwind GmbH (Germany),1400.00,USD
+2026-07-11,TX-85903,Service Fee,Service Fee for Hourly Invoice,Nordwind GmbH (Germany),-140.00,USD
+2026-06-03,TX-85120,Fixed Price,Landing page + CMS setup,Harbor Coffee (Canada),1100.00,USD
+2026-06-03,TX-85121,Service Fee,Service Fee for Fixed Price,Harbor Coffee (Canada),-110.00,USD
+2026-04-22,TX-84311,Fixed Price,Milestone 1 - Shopify store redesign,Bloom & Co (Australia),1500.00,USD
+2026-04-22,TX-84312,Service Fee,Service Fee for Fixed Price,Bloom & Co (Australia),-150.00,USD

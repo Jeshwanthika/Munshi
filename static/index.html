@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Munshi · AI accountant for cross-border freelancers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --khata:#8E1B1B; --khata-dark:#5E1010; --paper:#FBF6EC; --paper-2:#F3EAD8; --line:#E4D6BC;
+    --ink:#2A1F17; --muted:#7A6A58; --gold:#B8862F; --green:#2F6B3F; --amber:#B4631A; --red:#A12A2A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+  .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+  header{background:var(--khata);color:#FBEBD0;padding:14px 28px;display:flex;align-items:center;gap:16px;
+         border-bottom:4px solid var(--gold)}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand h1{font:700 26px "Fraunces",serif;margin:0;letter-spacing:.5px}
+  .brand .dev{font-family:"Tiro Devanagari Hindi",serif;font-size:20px;opacity:.8}
+  .tag{font-size:13px;opacity:.85}
+  header .meta{margin-left:auto;font-size:13px;display:flex;gap:14px;opacity:.9}
+  .pill{background:rgba(255,255,255,.12);padding:3px 10px;border-radius:99px}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;padding:24px 28px;max-width:1440px;margin:auto}
+  @media(max-width:1000px){.wrap{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:20px}
+  .card h2{font:600 17px "Fraunces",serif;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .card h2 small{font:400 13px "IBM Plex Sans";color:var(--muted);margin-left:auto}
+  /* Tax hero */
+  .hero{background:linear-gradient(135deg,var(--khata-dark),var(--khata));color:#FBEBD0;border:none;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px);pointer-events:none}
+  .hero .label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+  .hero .big{font:700 46px "Fraunces",serif;margin:4px 0}
+  .hero .compare{font-size:15px}
+  .hero .compare b{color:#FFD891}
+  .hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:end;position:relative;z-index:1}
+  .hero .side{border-left:1px solid rgba(255,255,255,.2);padding-left:20px;font-size:14px}
+  .hero .side div{margin:6px 0}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}.hero-grid{grid-template-columns:1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .kpi .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .kpi .v{font:600 22px "IBM Plex Mono",monospace;margin-top:4px}
+  /* sources */
+  .bar{display:grid;grid-template-columns:130px 1fr 110px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+  .bar .track{background:var(--paper-2);border-radius:4px;height:14px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--khata);border-radius:4px;transition:width .6s}
+  .bar:nth-child(2) .fill{background:var(--gold)} .bar:nth-child(3) .fill{background:var(--green)}
+  .bar .amt{text-align:right}
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+     border-bottom:1px solid var(--line);padding:6px 8px}
+  td{padding:9px 8px;border-bottom:1px dashed var(--line);vertical-align:middle}
+  tr.overdue td{background:#FDF1EC}
+  .status{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;display:inline-block}
+  .s-PAID,.s-MARKED_AS_PAID{background:#E3F0E5;color:var(--green)}
+  .s-SENT,.s-UNPAID{background:#FBEBD7;color:var(--amber)}
+  .s-DRAFT,.s-CANCELLED{background:#EEE;color:#777}
+  .s-OVERDUE{background:#F7DCDC;color:var(--red)}
+  .dup{text-decoration:line-through;color:var(--muted)}
+  .dupnote{font-size:12px;color:var(--green);display:block}
+  button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:#fff;padding:5px 12px}
+  button:hover{border-color:var(--khata);color:var(--khata)}
+  button.primary{background:var(--khata);color:#fff;border-color:var(--khata)}
+  button.primary:hover{background:var(--khata-dark);color:#fff}
+  .empty{color:var(--muted);font-size:14px;padding:8px 0}
+  .drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--muted);
+        background:var(--paper);transition:.2s}
+  .drop.over{border-color:var(--khata);background:#FFF5F0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .toast{background:#E3F0E5;color:var(--green);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:14px;display:none}
+  /* chat */
+  .chat{position:sticky;top:20px;height:calc(100vh - 120px);display:flex;flex-direction:column;padding:0;overflow:hidden}
+  .chat .head{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .chat .head h2{margin:0}
+  .chat .head p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14px;white-space:pre-wrap;word-wrap:break-word}
+  .msg.user{align-self:flex-end;background:var(--khata);color:#fff;border-bottom-right-radius:3px}
+  .msg.bot{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:3px}
+  .tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .tool{font-size:11px;background:#FFF;border:1px solid var(--gold);color:var(--gold);border-radius:99px;padding:1px 8px;font-weight:600}
+  .typing{color:var(--muted);font-style:italic;font-size:13px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px}
+  .chips button{font-size:12px;padding:4px 10px;background:var(--paper)}
+  form.ask{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+  form.ask input{flex:1;font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  form.ask input:focus{outline:2px solid var(--gold);border-color:transparent}
+  .err{background:#F7DCDC;color:var(--red);padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:0 0 24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><h1>Munshi</h1><span class="dev">मुंशी</span></div>
+  <span class="tag">AI accountant for India's cross-border freelancers · powered by PayPal</span>
+  <div class="meta"><span class="pill" id="fy">FY —</span><span class="pill" id="fx">$1 = ₹—</span></div>
+</header>
+
+<div class="wrap">
+<main>
+  <div class="err" id="err"></div>
+
+  <section class="card hero">
+    <div class="hero-grid">
+      <div>
+        <div class="label">Estimated income tax this year</div>
+        <div class="big num" id="taxBig">₹—</div>
+        <div class="compare" id="taxCompare">Loading your books…</div>
+      </div>
+      <div class="side">
+        <div>📈 Projected receipts: <b class="num" id="projected">—</b></div>
+        <div>🪙 Set aside: <b id="setAside">—</b> of every payment</div>
+        <div>📅 <span id="deadline">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k">Received this FY</div><div class="v" id="kReceived">—</div></div>
+    <div class="kpi"><div class="k">Awaiting payment</div><div class="v" id="kPending">—</div></div>
+    <div class="kpi"><div class="k">Platform fees</div><div class="v" id="kFees">—</div></div>
+    <div class="kpi"><div class="k">Overdue invoices</div><div class="v" id="kOverdue">—</div></div>
+  </div>
+
+  <section class="card">
+    <h2>Income by source <small>double-counted payouts removed</small></h2>
+    <div id="sources"><div class="empty">No income yet.</div></div>
+  </section>
+
+  <section class="card">
+    <h2>PayPal invoices <small><button onclick="load()">↻ Sync with PayPal</button></small></h2>
+    <table><thead><tr><th>Client</th><th>Amount</th><th>In ₹</th><th>Due</th><th>Status</th><th></th></tr></thead>
+      <tbody id="invoices"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table>
+  </section>
+
+  <section class="card">
+    <h2>Other sources <small>Upwork, bank statements & more</small></h2>
+    <div class="drop" id="drop">
+      <b>Drop a statement here</b> (CSV, TXT or PDF): Munshi's AI reads it, finds client payments and fees,
+      and spots payouts you've already counted.
+      <div class="row">
+        <label><button class="primary" onclick="document.getElementById('file').click()">Choose file</button></label>
+        <input type="file" id="file" hidden accept=".csv,.txt,.pdf">
+        <button onclick="trySample('upwork_statement.csv')">Try sample: Upwork</button>
+        <button onclick="trySample('hdfc_bank_statement.csv')">Try sample: HDFC bank</button>
+        <button onclick="resetImports()" title="Clear imported entries">Clear imports</button>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <table style="margin-top:14px"><thead><tr><th>Date</th><th>Source</th><th>From / description</th><th>Amount</th><th>In ₹</th></tr></thead>
+      <tbody id="entries"><tr><td colspan="5" class="empty">Nothing imported yet.</td></tr></tbody></table>
+  </section>
+  <footer>Estimates only: new tax regime, Income Tax Act 2025. Confirm with a CA before filing. Sandbox demo, no real money moves.</footer>
+</main>
+
+<aside class="card chat">
+  <div class="head"><h2>Ask Munshi</h2><p>Bill clients, chase payments and check your tax, in plain words.</p></div>
+  <div class="msgs" id="msgs">
+    <div class="msg bot">Namaste! I'm Munshi 🙏 I can send PayPal invoices to your clients, chase late payments, and tell you how much tax to keep aside. What shall we do?</div>
+  </div>
+  <div class="chips" id="chips">
+    <button>Bill a new client</button>
+    <button>Who hasn't paid me yet?</button>
+    <button>How much tax will I owe this year?</button>
+  </div>
+  <form class="ask" id="ask"><input id="q" placeholder="e.g. Bill Acme $1,200 for a landing page" autocomplete="off"><button class="primary">Send</button></form>
+</aside>
+</div>
+
+<script>
+const inr = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $ = id => document.getElementById(id);
+const TOOL_NAMES = {create_and_send_invoice:'PayPal · create & send invoice', list_invoices:'PayPal · list invoices',
+  send_reminder:'PayPal · send reminder', get_income_and_tax:'Ledger · income & tax'};
+let session = null;
+
+function showErr(m){ $('err').textContent = m; $('err').style.display = m ? 'block':'none'; }
+
+async function load(){
+  try{
+    const r = await fetch('/api/summary'); const s = await r.json();
+    if(!r.ok) throw new Error(s.detail || 'Could not load');
+    showErr('');
+    render(s);
+  }catch(e){ showErr('Could not reach PayPal: ' + e.message); }
+}
+
+function render(s){
+  const t = s.tax;
+  $('fy').textContent = 'FY ' + t.financial_year;
+  $('fx').textContent = '$1 = ₹' + s.usd_inr;
+  $('taxBig').textContent = inr(t.estimated_annual_tax_inr);
+  if (t.recommended === 'presumptive' && t.tax_if_regular_inr > t.tax_if_presumptive_inr){
+    $('taxCompare').innerHTML = `with the <b>presumptive scheme</b> (Sec 58), vs <b>${inr(t.tax_if_regular_inr)}</b> the regular way. You save <b>${inr(t.tax_if_regular_inr - t.tax_if_presumptive_inr)}</b>.`;
+  } else {
+    $('taxCompare').innerHTML = `Recommended: <b>${t.recommended}</b> method (new regime).`;
+  }
+  $('projected').textContent = inr(t.projected_annual_receipts_inr);
+  $('setAside').textContent = t.set_aside_percent_of_each_payment + '%';
+  $('deadline').textContent = t.advance_tax_deadline;
+  $('kReceived').textContent = inr(s.received_inr);
+  $('kPending').textContent = inr(s.pending_inr);
+  $('kFees').textContent = inr(s.fees_inr);
+  $('kOverdue').textContent = s.overdue.length;
+
+  const src = Object.entries(s.by_source).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1, ...src.map(x=>x[1]));
+  $('sources').innerHTML = src.length ? src.map(([k,v])=>
+    `<div class="bar"><span>${esc(k)}</span><div class="track"><div class="fill" style="width:${100*v/max}%"></div></div><span class="amt num">${inr(v)}</span></div>`).join('')
+    : '<div class="empty">No income yet. Send an invoice or import a statement.</div>';
+
+  const overdueIds = new Set(s.overdue.map(i=>i.invoice_id));
+  $('invoices').innerHTML = s.invoices.length ? s.invoices.map(i=>{
+    const od = overdueIds.has(i.invoice_id);
+    const st = od ? 'OVERDUE' : i.status;
+    const canRemind = ['SENT','UNPAID'].includes(i.status);
+    return `<tr class="${od?'overdue':''}"><td>${esc(i.client)}<br><small style="color:var(--muted)">${esc(i.invoice_id)}</small></td>
+      <td class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</td><td class="num">${inr(i.amount_inr)}</td>
+      <td>${esc(i.due_date||'—')}</td><td><span class="status s-${st}">${st.replace('_',' ')}</span></td>
+      <td>${canRemind?`<button onclick="ask('Send a polite payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button>`:''}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty">No invoices yet. Ask Munshi to bill a client →</td></tr>';
+
+  $('entries').innerHTML = s.entries.length ? s.entries.map(e=>{
+    const dup = !!e.duplicate_of, fee = e.entry_type==='fee';
+    return `<tr><td>${esc(e.date)}</td><td>${esc(e.source)}</td>
+      <td>${esc(e.payer)}${e.payer&&e.description?' · ':''}<small>${esc(e.description)}</small>
+        ${dup?`<span class="dupnote">✓ Already counted: ${esc(e.duplicate_of)}</span>`:''}</td>
+      <td class="num ${dup?'dup':''}">${fee?'− ':''}${esc(e.currency)} ${Number(e.amount).toLocaleString('en-IN')}</td>
+      <td class="num ${dup?'dup':''}">${fee?'− ':''}${inr(e.amount_inr)}</td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty">Nothing imported yet.</td></tr>';
+}
+
+// ---- uploads ----
+async function uploadFile(file){
+  $('toast').style.display='block'; $('toast').textContent = `🤖 Munshi is reading ${file.name}…`;
+  const fd = new FormData(); fd.append('file', file);
+  try{
+    const r = await fetch('/api/upload',{method:'POST',body:fd}); const d = await r.json();
+    if(!r.ok) throw new Error(d.detail);
+    const inc = d.added.filter(a=>a.entry_type==='income' && !a.duplicate_of).length;
+    const fees = d.added.filter(a=>a.entry_type==='fee').length;
+    let msg = `✓ ${d.source}: found ${inc} client payment(s)` + (fees?` and ${fees} fee(s)`:'') + '.';
+    if (d.duplicates_caught.length) msg += ` Caught ${d.duplicates_caught.length} payout(s) you'd already counted, so they won't be taxed twice.`;
+    if (!d.added.length) msg = `Nothing new in ${d.source}. Everything was already imported.`;
+    $('toast').textContent = msg;
+    load();
+  }catch(e){ $('toast').textContent = '⚠ ' + e.message; }
+}
+async function trySample(name){
+  const r = await fetch('/samples/' + name); const blob = await r.blob();
+  uploadFile(new File([blob], name, {type:'text/csv'}));
+}
+async function resetImports(){ await fetch('/api/reset-imports',{method:'POST'}); $('toast').style.display='none'; load(); }
+$('file').onchange = e => e.target.files[0] && uploadFile(e.target.files[0]);
+const drop = $('drop');
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop', e => e.dataTransfer.files[0] && uploadFile(e.dataTransfer.files[0]));
+
+// ---- chat ----
+function addMsg(cls, html){ const d=document.createElement('div'); d.className='msg '+cls; d.innerHTML=html; $('msgs').appendChild(d); $('msgs').scrollTop=1e9; return d; }
+function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s)]+)/g,'<a href="$1" target="_blank">$1</a>'); }
+async function ask(text){
+  if(!text.trim()) return;
+  addMsg('user', esc(text));
+  const wait = addMsg('bot', '<span class="typing">Munshi is working…</span>');
+  try{
+    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text, session_id:session})});
+    const d = await r.json(); session = d.session_id;
+    const tools = (d.tools_used||[]).map(n=>`<span class="tool">⚙ ${esc(TOOL_NAMES[n]||n)}</span>`).join('');
+    wait.innerHTML = (tools?`<div class="tools">${tools}</div>`:'') + fmt(d.reply);
+    if ((d.tools_used||[]).some(n=>n!=='get_income_and_tax')) load();
+  }catch(e){ wait.textContent = 'Network error: ' + e.message; }
+}
+$('ask').onsubmit = e => { e.preventDefault(); const v=$('q').value; $('q').value=''; ask(v); };
+$('chips').onclick = e => { if(e.target.tagName==='BUTTON') ask(e.target.textContent); };
+load();
+</script>
+</body>
+</html>
