@@ -76,7 +76,15 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None):
         "advance_tax_deadline": (f"Pay full advance tax by 15 March {fy_end.year} (presumptive scheme)"
                                  if best == "presumptive" else
                                  "Quarterly: 15% by 15 Jun, 45% by 15 Sep, 75% by 15 Dec, 100% by 15 Mar"),
-        "disclaimer": "Estimate only, new regime, surcharge ignored. Confirm with a CA before filing.",
+        "assumptions": [
+            "Resident individual, under 60, new tax regime (default) for Tax Year 2026-27",
+            "Projection = receipts so far scaled to 12 months of the financial year",
+            "Presumptive: 50% of receipts deemed income (Sec 58, formerly 44ADA); all PayPal receipts are digital",
+            "Regular method: receipts minus recorded platform fees / expenses you provide",
+            "No other income (salary, interest, capital gains) and no surcharge (income above 50 lakh)",
+            "Foreign currency converted at a single configured rate, not the rate on each receipt date",
+        ],
+        "disclaimer": "Estimate only. Confirm with a CA before filing.",
     }
 
 

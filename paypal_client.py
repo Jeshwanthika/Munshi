@@ -54,14 +54,16 @@ def payer_link(invoice_id):
 # ---------- Invoices ----------
 
 def create_and_send_invoice(client_name, client_email, description, amount,
-                            currency="USD", due_in_days=15, note=""):
-    due = (date.today() + timedelta(days=int(due_in_days))).isoformat()
+                            currency="USD", due_in_days=15, note="", invoice_date=None):
+    start = date.fromisoformat(invoice_date) if invoice_date else date.today()
+    due = (start + timedelta(days=int(due_in_days))).isoformat()
     parts = client_name.strip().split(" ", 1)
     body = {
         "detail": {
             "currency_code": currency,
             "note": note or "Thank you for your business!",
             "payment_term": {"due_date": due},
+            **({"invoice_date": invoice_date} if invoice_date else {}),
         },
         "primary_recipients": [{
             "billing_info": {
@@ -109,3 +111,26 @@ def send_reminder(invoice_id, note):
           json={"subject": "Friendly reminder: invoice due", "note": note,
                 "send_to_invoicer": True})
     return {"invoice_id": invoice_id, "reminder_sent": True}
+
+
+# ---------- Webhooks ----------
+
+def verify_webhook(headers, event):
+    """Ask PayPal to verify the webhook signature. Never trust an unverified event."""
+    webhook_id = os.getenv("PAYPAL_WEBHOOK_ID")
+    if not webhook_id:
+        return False
+    h = {k.lower(): v for k, v in headers.items()}
+    body = {
+        "auth_algo": h.get("paypal-auth-algo"),
+        "cert_url": h.get("paypal-cert-url"),
+        "transmission_id": h.get("paypal-transmission-id"),
+        "transmission_sig": h.get("paypal-transmission-sig"),
+        "transmission_time": h.get("paypal-transmission-time"),
+        "webhook_id": webhook_id,
+        "webhook_event": event,
+    }
+    if not all(body.values()):
+        return False
+    res = _call("POST", "/v1/notifications/verify-webhook-signature", json=body)
+    return res.get("verification_status") == "SUCCESS"
