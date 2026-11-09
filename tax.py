@@ -43,15 +43,25 @@ def financial_year(today=None):
     return date(start_year, 4, 1), date(start_year + 1, 3, 31)
 
 
-def estimate(gross_receipts_inr, expenses_inr=0.0, today=None):
-    """Compare presumptive (50%) vs regular (receipts - expenses) for this FY."""
+import os
+
+KIND = os.getenv("FREELANCER_TYPE", "profession")   # profession (IT, engineering, consulting...) | business
+BUSINESS_RATE, BUSINESS_LIMIT = 0.06, 30_000_000    # Sec 58 business scheme: 6% of digital receipts, 3 crore
+
+
+def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None):
+    """Compare presumptive vs regular (receipts - expenses) for this FY.
+    kind='profession': specified profession, 50% of receipts (limit 75 lakh)
+    kind='business'  : non-specified work, 6% of digital receipts (limit 3 crore)"""
     today = today or date.today()
+    kind = kind or KIND
+    rate, limit = (BUSINESS_RATE, BUSINESS_LIMIT) if kind == "business" else (0.5, PRESUMPTIVE_LIMIT)
     fy_start, fy_end = financial_year(today)
     months_elapsed = max(1, (today.year - fy_start.year) * 12 + today.month - fy_start.month + 1)
     projected = gross_receipts_inr * 12 / months_elapsed
 
-    eligible = projected <= PRESUMPTIVE_LIMIT
-    presumptive_income = projected * 0.5
+    eligible = projected <= limit
+    presumptive_income = projected * rate
     regular_income = max(0.0, projected - expenses_inr * 12 / months_elapsed)
 
     tax_presumptive = total_tax(presumptive_income) if eligible else None
@@ -64,6 +74,8 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None):
     best_tax = options[best]
 
     return {
+        "freelancer_type": kind,
+        "presumptive_rate": rate,
         "financial_year": f"{fy_start.year}-{str(fy_end.year)[2:]}",
         "receipts_so_far_inr": round(gross_receipts_inr),
         "projected_annual_receipts_inr": round(projected),
@@ -79,7 +91,9 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None):
         "assumptions": [
             "Resident individual, under 60, new tax regime (default) for Tax Year 2026-27",
             "Projection = receipts so far scaled to 12 months of the financial year",
-            "Presumptive: 50% of receipts deemed income (Sec 58, formerly 44ADA); all PayPal receipts are digital",
+            (f"Presumptive: {rate:.0%} of receipts deemed income (Sec 58; "
+             + ("specified profession, formerly 44ADA" if kind != "business" else "business scheme for digital receipts, formerly 44AD")
+             + "); all PayPal receipts are digital"),
             "Regular method: receipts minus recorded platform fees / expenses you provide",
             "No other income (salary, interest, capital gains) and no surcharge (income above 50 lakh)",
             "Foreign currency converted at a single configured rate, not the rate on each receipt date",

@@ -8,6 +8,7 @@ from datetime import date, datetime
 import db
 import ledger
 import paypal_client as pp
+import rag
 import tax
 
 WRITE_TOOLS = {"create_and_send_invoice", "send_reminder"}  # paused for human approval
@@ -49,6 +50,11 @@ SPECS = {
         "parameters": {"type": "object", "properties": {
             "extra_expenses_inr": {**_nullable("number"), "description": "Optional business expenses this FY, INR"},
         }}},
+    "search_tax_rules": {
+        "description": "Search Munshi's tax & compliance knowledge base (Section 58 presumptive scheme, advance tax, slabs & rebate, GST on exports & LUT, purpose codes & FIRC, ITR & records). Returns rule passages with citations.",
+        "parameters": {"type": "object", "properties": {
+            "query": {"type": "string", "description": "The rule question in plain words"},
+        }, "required": ["query"]}},
     "list_imported_entries": {
         "description": "Entries imported from Upwork/bank statements, including which bank credits were ignored as duplicates and why.",
         "parameters": {"type": "object", "properties": {}}},
@@ -57,7 +63,7 @@ SPECS = {
 AGENT_TOOLS = {
     "billing": ["create_and_send_invoice", "list_invoices"],
     "collections": ["find_invoices_needing_followup", "send_reminder", "get_payment_updates", "list_invoices"],
-    "tax": ["get_income_and_tax"],          # + search_tax_rules (RAG) added in rag.py
+    "tax": ["get_income_and_tax", "search_tax_rules"],
     "statement": ["list_imported_entries", "get_income_and_tax"],
 }
 
@@ -127,6 +133,7 @@ IMPL = {
     "get_payment_updates": lambda **a: get_payment_updates(),
     "get_income_and_tax": lambda **a: get_income_and_tax(**a),
     "list_imported_entries": lambda **a: list_imported_entries(),
+    "search_tax_rules": lambda **a: rag.search_tax_rules(a.get("query", "")),
 }
 
 

@@ -14,6 +14,7 @@ import db
 import graph
 import ledger
 import paypal_client as pp
+import rag
 
 app = FastAPI(title="Munshi")
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -110,6 +111,12 @@ async def paypal_webhook(request: Request):
                                    json.dumps(event)[:20000])
     # Duplicate deliveries are acknowledged but not processed twice.
     return {"received": True, "duplicate": not is_new}
+
+
+@app.get("/api/rules")
+def rules(q: str):
+    """Transparent RAG: show exactly which rule passages the Tax advisor would retrieve."""
+    return rag.search_tax_rules(q, k=4)
 
 
 @app.get("/api/audit")

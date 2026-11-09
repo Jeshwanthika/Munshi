@@ -27,6 +27,9 @@ def _get_token():
         data={"grant_type": "client_credentials"},
         timeout=30,
     )
+    if r.status_code == 401:
+        raise PayPalError("PayPal rejected your app keys (401 invalid_client). Copy the current Client ID and "
+                          "Secret from developer.paypal.com into .env, then fully restart the server (Ctrl+C).")
     if r.status_code != 200:
         raise PayPalError(f"PayPal login failed ({r.status_code}): {r.text}")
     data = r.json()

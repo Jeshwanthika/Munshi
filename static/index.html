@@ -5,182 +5,286 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Munshi · AI accountant for cross-border freelancers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 <style>
   :root{
-    --khata:#8E1B1B; --khata-dark:#5E1010; --paper:#FBF6EC; --paper-2:#F3EAD8; --line:#E4D6BC;
-    --ink:#2A1F17; --muted:#7A6A58; --gold:#B8862F; --green:#2F6B3F; --amber:#B4631A; --red:#A12A2A;
+    --brand:#0B5D3B; --brand-dark:#063D27; --brand-ink:#04291A; --brand-soft:#E6F2EB;
+    --gold:#C9A227; --gold-soft:#FBF3D9;
+    --bg:#F4F7F4; --card:#FFFFFF; --line:#DCE6DF; --ink:#13261C; --muted:#5E6F66;
+    --green:#1E7A4C; --amber:#A86400; --red:#B3261E; --red-soft:#FBE9E7; --amber-soft:#FDF1DC;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--ink);font:14.5px/1.5 "IBM Plex Sans",system-ui,sans-serif;overflow:hidden}
   .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-  header{background:var(--khata);color:#FBEBD0;padding:14px 28px;display:flex;align-items:center;gap:16px;
-         border-bottom:4px solid var(--gold)}
-  .brand{display:flex;align-items:baseline;gap:10px}
-  .brand h1{font:700 26px "Fraunces",serif;margin:0;letter-spacing:.5px}
-  .brand .dev{font-family:"Tiro Devanagari Hindi",serif;font-size:20px;opacity:.8}
-  .tag{font-size:13px;opacity:.85}
-  header .meta{margin-left:auto;font-size:13px;display:flex;gap:14px;opacity:.9}
-  .pill{background:rgba(255,255,255,.12);padding:3px 10px;border-radius:99px}
-  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;padding:24px 28px;max-width:1440px;margin:auto}
-  @media(max-width:1000px){.wrap{grid-template-columns:1fr}}
-  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:20px}
-  .card h2{font:600 17px "Fraunces",serif;margin:0 0 12px;display:flex;align-items:center;gap:8px}
-  .card h2 small{font:400 13px "IBM Plex Sans";color:var(--muted);margin-left:auto}
-  /* Tax hero */
-  .hero{background:linear-gradient(135deg,var(--khata-dark),var(--khata));color:#FBEBD0;border:none;position:relative;overflow:hidden}
-  .hero:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px);pointer-events:none}
-  .hero .label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
-  .hero .big{font:700 46px "Fraunces",serif;margin:4px 0}
-  .hero .compare{font-size:15px}
-  .hero .compare b{color:#FFD891}
-  .hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:end;position:relative;z-index:1}
-  .hero .side{border-left:1px solid rgba(255,255,255,.2);padding-left:20px;font-size:14px}
-  .hero .side div{margin:6px 0}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-  @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}.hero-grid{grid-template-columns:1fr}}
-  .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-  .kpi .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  .kpi .v{font:600 22px "IBM Plex Mono",monospace;margin-top:4px}
-  /* sources */
-  .bar{display:grid;grid-template-columns:130px 1fr 110px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
-  .bar .track{background:var(--paper-2);border-radius:4px;height:14px;overflow:hidden}
-  .bar .fill{height:100%;background:var(--khata);border-radius:4px;transition:width .6s}
-  .bar:nth-child(2) .fill{background:var(--gold)} .bar:nth-child(3) .fill{background:var(--green)}
+  .app{display:grid;grid-template-columns:232px minmax(0,1fr) 390px;height:100vh}
+
+  /* ---------- sidebar ---------- */
+  nav{background:var(--brand-ink);color:#D9EBE0;display:flex;flex-direction:column;padding:20px 14px}
+  .brand{display:flex;align-items:baseline;gap:8px;padding:0 8px 4px}
+  .brand h1{font:700 26px "Fraunces",serif;margin:0;color:#fff}
+  .brand .dev{font-family:"Tiro Devanagari Hindi",serif;font-size:19px;color:var(--gold)}
+  .brand-sub{font-size:12px;color:#9DBCAB;padding:0 8px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:12px}
+  nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:#CFE3D7;text-decoration:none;
+        margin-bottom:2px;border-left:3px solid transparent;cursor:pointer}
+  nav a .ic{width:20px;text-align:center}
+  nav a .sub{display:block;font-size:11px;color:#89A898;margin-top:-1px}
+  nav a:hover{background:rgba(255,255,255,.06)}
+  nav a.active{background:rgba(201,162,39,.14);color:#fff;border-left-color:var(--gold)}
+  nav a .badge{margin-left:auto;background:var(--red);color:#fff;font-size:11px;font-weight:600;border-radius:99px;padding:0 7px;display:none}
+  nav .foot{margin-top:auto;font-size:12px;color:#89A898;display:flex;flex-direction:column;gap:6px;padding:0 8px}
+  nav .pill{background:rgba(255,255,255,.07);border-radius:99px;padding:3px 10px;display:inline-block}
+
+  /* ---------- main ---------- */
+  main{display:flex;flex-direction:column;min-height:0;padding:22px 26px;gap:16px}
+  .page{display:none;flex-direction:column;gap:16px;flex:1;min-height:0}
+  .page.active{display:flex}
+  .ph{display:flex;align-items:flex-end;gap:12px}
+  .ph h2{font:700 24px "Fraunces",serif;margin:0}
+  .ph p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+  .ph .actions{margin-left:auto;display:flex;gap:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-height:0}
+  .card h3{font:600 16px "Fraunces",serif;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .card h3 small{font:400 12.5px "IBM Plex Sans";color:var(--muted);margin-left:auto}
+  .grow{flex:1;min-height:0}
+  .scroll{overflow:auto;min-height:0;flex:1}
+  .scroll::-webkit-scrollbar{width:6px;height:6px} .scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:0}
+  .row-main{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;flex:1;min-height:0}
+
+  /* hero */
+  .hero{background:linear-gradient(120deg,var(--brand-ink),var(--brand) 70%);color:#E8F4EC;border:none;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;inset:0;pointer-events:none;
+              background:repeating-linear-gradient(0deg,transparent 0 25px,rgba(255,255,255,.045) 25px 26px)}
+  .hero-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:center;position:relative;z-index:1}
+  .hero .label{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#A9CDB8}
+  .hero .big{font:700 44px "Fraunces",serif;margin:2px 0;color:#fff}
+  .hero .compare b{color:var(--gold)}
+  .hero .side{border-left:1px solid rgba(255,255,255,.18);padding-left:20px;font-size:13.5px}
+  .hero .side div{margin:5px 0}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+  .kpi .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .kpi .v{font:600 21px "IBM Plex Mono",monospace;margin-top:2px}
+  .kpi.alert .v{color:var(--red)}
+
+  .bar{display:grid;grid-template-columns:110px 1fr 104px;gap:10px;align-items:center;margin:7px 0;font-size:13.5px}
+  .bar .track{background:var(--brand-soft);border-radius:4px;height:12px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--brand);border-radius:4px;transition:width .6s}
+  .bar:nth-child(2) .fill{background:var(--gold)} .bar:nth-child(3) .fill{background:#4E9A73} .bar:nth-child(4) .fill{background:#8FB9A2}
   .bar .amt{text-align:right}
-  /* tables */
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{position:sticky;top:0;background:var(--card);z-index:1}
+  th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;
      border-bottom:1px solid var(--line);padding:6px 8px}
-  td{padding:9px 8px;border-bottom:1px dashed var(--line);vertical-align:middle}
-  tr.overdue td{background:#FDF1EC}
-  .status{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;display:inline-block}
-  .s-PAID,.s-MARKED_AS_PAID{background:#E3F0E5;color:var(--green)}
-  .s-SENT,.s-UNPAID{background:#FBEBD7;color:var(--amber)}
-  .s-DRAFT,.s-CANCELLED{background:#EEE;color:#777}
-  .s-OVERDUE{background:#F7DCDC;color:var(--red)}
+  td{padding:8px;border-bottom:1px dashed var(--line);vertical-align:middle}
+  tr.overdue td{background:var(--red-soft)}
+  .status{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;display:inline-block;white-space:nowrap}
+  .s-PAID,.s-MARKED_AS_PAID,.s-approved{background:var(--brand-soft);color:var(--green)}
+  .s-SENT,.s-UNPAID,.s-DUE_SOON{background:var(--amber-soft);color:var(--amber)}
+  .s-DRAFT,.s-CANCELLED{background:#EEF1EF;color:#6B7A72}
+  .s-OVERDUE,.s-rejected{background:var(--red-soft);color:var(--red)}
   .dup{text-decoration:line-through;color:var(--muted)}
   .dupnote{font-size:12px;color:var(--green);display:block}
-  button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:#fff;padding:5px 12px}
-  button:hover{border-color:var(--khata);color:var(--khata)}
-  button.primary{background:var(--khata);color:#fff;border-color:var(--khata)}
-  button.primary:hover{background:var(--khata-dark);color:#fff}
-  .empty{color:var(--muted);font-size:14px;padding:8px 0}
-  .drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--muted);
-        background:var(--paper);transition:.2s}
-  .drop.over{border-color:var(--khata);background:#FFF5F0}
-  .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
-  .toast{background:#E3F0E5;color:var(--green);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:14px;display:none}
-  /* chat */
-  .chat{position:sticky;top:20px;height:calc(100vh - 120px);display:flex;flex-direction:column;padding:0;overflow:hidden}
-  .chat .head{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--paper-2)}
-  .chat .head h2{margin:0}
-  .chat .head p{margin:2px 0 0;font-size:13px;color:var(--muted)}
-  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-  .msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14px;white-space:pre-wrap;word-wrap:break-word}
-  .msg.user{align-self:flex-end;background:var(--khata);color:#fff;border-bottom-right-radius:3px}
-  .msg.bot{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:3px}
-  .tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
-  .tool{font-size:11px;background:#FFF;border:1px solid var(--gold);color:var(--gold);border-radius:99px;padding:1px 8px;font-weight:600}
-  .agent{font-size:11px;background:var(--khata);color:#fff;border-radius:99px;padding:1px 8px;font-weight:600}
+  .muted{color:var(--muted)} .empty{color:var(--muted);font-size:13.5px;padding:6px 0}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:#fff;padding:6px 13px;color:var(--ink)}
+  button:hover{border-color:var(--brand);color:var(--brand)}
+  button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  button.primary:hover{background:var(--brand-dark);color:#fff}
+  button.gold{background:var(--gold);color:var(--brand-ink);border-color:var(--gold);font-weight:600}
+  button.gold:hover{background:#B38E1C;color:var(--brand-ink)}
+  .attn{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .attn .what{flex:1}
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--muted);background:var(--bg);transition:.2s}
+  .drop.over{border-color:var(--brand);background:var(--brand-soft)}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .toast{background:var(--brand-soft);color:var(--green);border-radius:8px;padding:9px 14px;font-size:13.5px;display:none}
+  .err{background:var(--red-soft);color:var(--red);padding:9px 14px;border-radius:8px;display:none}
+  ul.assume{margin:0;padding-left:18px;color:var(--ink)} ul.assume li{margin:4px 0}
+  .compare-tbl td.v{text-align:right}
+  .rule{border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:13.5px}
+  .rule .rt{font-weight:600;color:var(--brand-dark)} .rule .rs{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .rule .sc{float:right;font-size:11px;color:var(--muted)}
+  .compare-tbl tr.best td{background:var(--brand-soft);font-weight:600}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{counter-increment:s;display:flex;gap:10px;margin:8px 0;font-size:13.5px}
+  .steps li:before{content:counter(s);background:var(--brand-soft);color:var(--brand);font-weight:600;border-radius:99px;
+                   width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  /* ---------- chat ---------- */
+  aside{border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;min-height:0}
+  aside .head{padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+  aside .head h2{font:700 19px "Fraunces",serif;margin:0}
+  aside .head p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+  .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+  .msg{max-width:90%;padding:10px 13px;border-radius:12px;font-size:13.5px;white-space:pre-wrap;word-wrap:break-word}
+  .msg.user{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:3px}
+  .msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:3px}
+  .msg.bot.action{max-width:100%;align-self:stretch;background:#fff;border:2px solid var(--gold);white-space:normal}
+  .msg a{color:var(--brand);word-break:break-all}
+  .tools{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+  .agent{font-size:11px;background:var(--brand);color:#fff;border-radius:99px;padding:1px 8px;font-weight:600}
+  .tool{font-size:11px;background:#fff;border:1px solid var(--gold);color:#8A6D10;border-radius:99px;padding:1px 8px;font-weight:600}
   .tool.ok{border-color:var(--green);color:var(--green)} .tool.no{border-color:var(--red);color:var(--red)}
-  .approval{align-self:stretch;background:#FFFBF2;border:2px solid var(--gold);border-radius:12px;padding:12px 14px;font-size:14px}
-  .approval .t{font-weight:600;color:var(--khata);margin-bottom:4px}
-  .approval label{display:block;font-size:12px;color:var(--muted);margin-top:8px}
-  .approval input,.approval textarea{width:100%;font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
-  .approval textarea{min-height:70px;resize:vertical}
-  .approval .btns{display:flex;gap:8px;margin-top:10px}
-  .approval.done{opacity:.6;pointer-events:none}
-  button.auto{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:600}
-  button.auto:hover{background:#9C6F22;color:#fff}
-  .typing{color:var(--muted);font-style:italic;font-size:13px}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px}
-  .chips button{font-size:12px;padding:4px 10px;background:var(--paper)}
-  form.ask{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
-  form.ask input{flex:1;font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
-  form.ask input:focus{outline:2px solid var(--gold);border-color:transparent}
-  .err{background:#F7DCDC;color:var(--red);padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none}
-  footer{text-align:center;color:var(--muted);font-size:12px;padding:0 0 24px}
+  .typing{color:var(--muted);font-style:italic}
+  /* approval form inside the agent's message */
+  .act-title{font-weight:600;color:var(--brand-dark);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .act-title .tag{white-space:nowrap;font-size:10.5px;background:var(--gold-soft);color:#8A6D10;border-radius:99px;padding:1px 8px;margin-left:auto;text-transform:uppercase;letter-spacing:.05em}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+  .fgrid .full{grid-column:1/-1}
+  .fgrid label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block}
+  .fgrid input,.fgrid textarea{width:100%;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+  .fgrid input:focus,.fgrid textarea:focus{outline:2px solid var(--gold);border-color:transparent;background:#fff}
+  .fgrid textarea{min-height:64px;resize:vertical}
+  .act-btns{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .act-btns button{white-space:nowrap}
+  .act-btns .hint{font-size:11.5px;color:var(--muted);margin-left:auto}
+  .msg.action.done{opacity:.55;pointer-events:none;border-color:var(--line)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px}
+  .chips button{font-size:12px;padding:4px 10px;background:var(--bg)}
+  form.ask{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+  form.ask input{flex:1;font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+  form.ask input:focus{outline:2px solid var(--gold);border-color:transparent;background:#fff}
+
+  @media (max-width:1180px){ body{overflow:auto} .app{grid-template-columns:200px 1fr;height:auto} aside{grid-column:1/-1;height:80vh} }
 </style>
 </head>
 <body>
-<header>
-  <div class="brand"><h1>Munshi</h1><span class="dev">मुंशी</span></div>
-  <span class="tag">AI accountant for India's cross-border freelancers · powered by PayPal</span>
-  <div class="meta"><span class="pill" id="fy">FY —</span><span class="pill" id="fx">$1 = ₹—</span></div>
-</header>
+<div class="app">
 
-<div class="wrap">
+<nav>
+  <div class="brand"><h1>Munshi</h1><span class="dev">मुंशी</span></div>
+  <div class="brand-sub">AI accountant for cross-border freelancers · on PayPal</div>
+  <a data-page="dashboard" class="active"><span class="ic">🏠</span><span>Dashboard</span></a>
+  <a data-page="invoices"><span class="ic">💸</span><span>Invoices<span class="sub">Billing agent</span></span></a>
+  <a data-page="collections"><span class="ic">🔍</span><span>Collections<span class="sub">Autopilot agent</span></span><span class="badge" id="navOverdue"></span></a>
+  <a data-page="tax"><span class="ic">📊</span><span>Tax<span class="sub">Tax advisor agent</span></span></a>
+  <a data-page="statements"><span class="ic">📄</span><span>Statements<span class="sub">Statement agent</span></span></a>
+  <a data-page="audit"><span class="ic">🛡️</span><span>Approvals log</span></a>
+  <div class="foot">
+    <span><span class="pill" id="fy">FY —</span></span>
+    <span><span class="pill" id="fx">$1 = ₹—</span></span>
+    <span>PayPal sandbox · no real money</span>
+  </div>
+</nav>
+
 <main>
   <div class="err" id="err"></div>
 
-  <section class="card hero">
-    <div class="hero-grid">
-      <div>
-        <div class="label">Estimated income tax this year</div>
-        <div class="big num" id="taxBig">₹—</div>
-        <div class="compare" id="taxCompare">Loading your books…</div>
+  <!-- DASHBOARD -->
+  <section class="page active" id="p-dashboard">
+    <div class="ph"><div><h2>Namaste 👋</h2><p>Your books across PayPal, Upwork and your bank, with the tax worked out.</p></div>
+      <div class="actions"><button onclick="load()">↻ Sync with PayPal</button></div></div>
+    <div class="card hero">
+      <div class="hero-grid">
+        <div><div class="label">Estimated income tax this year</div>
+          <div class="big num" id="taxBig">₹—</div><div class="compare" id="taxCompare">Loading your books…</div></div>
+        <div class="side">
+          <div>📈 Projected receipts: <b class="num" id="projected">—</b></div>
+          <div>🪙 Set aside: <b id="setAside">—</b> of every payment</div>
+          <div>📅 <span id="deadline">—</span></div>
+        </div>
       </div>
-      <div class="side">
-        <div>📈 Projected receipts: <b class="num" id="projected">—</b></div>
-        <div>🪙 Set aside: <b id="setAside">—</b> of every payment</div>
-        <div>📅 <span id="deadline">—</span></div>
-      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">Received this FY</div><div class="v" id="kReceived">—</div></div>
+      <div class="kpi"><div class="k">Awaiting payment</div><div class="v" id="kPending">—</div></div>
+      <div class="kpi"><div class="k">Platform fees</div><div class="v" id="kFees">—</div></div>
+      <div class="kpi" id="kOverdueBox"><div class="k">Overdue invoices</div><div class="v" id="kOverdue">—</div></div>
+    </div>
+    <div class="row-main">
+      <div class="card"><h3>Income by source <small>double-counted payouts removed</small></h3>
+        <div class="scroll" id="sources"></div>
+        <div style="margin-top:8px"><button onclick="go('statements')">+ Add Upwork / bank statement</button></div></div>
+      <div class="card"><h3>Needs your attention <small><a onclick="go('collections')" style="cursor:pointer;color:var(--brand)">Collections →</a></small></h3>
+        <div class="scroll" id="attention"></div></div>
     </div>
   </section>
 
-  <div class="kpis">
-    <div class="kpi"><div class="k">Received this FY</div><div class="v" id="kReceived">—</div></div>
-    <div class="kpi"><div class="k">Awaiting payment</div><div class="v" id="kPending">—</div></div>
-    <div class="kpi"><div class="k">Platform fees</div><div class="v" id="kFees">—</div></div>
-    <div class="kpi"><div class="k">Overdue invoices</div><div class="v" id="kOverdue">—</div></div>
-  </div>
-
-  <section class="card">
-    <h2>Income by source <small>double-counted payouts removed</small></h2>
-    <div id="sources"><div class="empty">No income yet.</div></div>
+  <!-- INVOICES -->
+  <section class="page" id="p-invoices">
+    <div class="ph"><div><h2>Invoices</h2><p>Live from PayPal. The Billing agent drafts invoices; you approve each one before it's sent.</p></div>
+      <div class="actions"><button class="primary" onclick="prefill('Bill ')">+ New invoice</button><button onclick="load()">↻ Sync</button></div></div>
+    <div class="card grow"><div class="scroll">
+      <table><thead><tr><th>Client</th><th>Amount</th><th>In ₹</th><th>Issued</th><th>Due</th><th>Status</th><th></th></tr></thead>
+        <tbody id="invoices"></tbody></table></div></div>
   </section>
 
-  <section class="card">
-    <h2>PayPal invoices <small><button class="auto" onclick="autopilot()" title="Collections agent checks payments and drafts reminders. You approve each one.">🤖 Run Autopilot</button> <button onclick="load()">↻ Sync with PayPal</button></small></h2>
-    <table><thead><tr><th>Client</th><th>Amount</th><th>In ₹</th><th>Due</th><th>Status</th><th></th></tr></thead>
-      <tbody id="invoices"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table>
+  <!-- COLLECTIONS -->
+  <section class="page" id="p-collections">
+    <div class="ph"><div><h2>Collections</h2><p>Autopilot checks PayPal for new payments and chases late clients, with a reminder tone that fits how late they are.</p></div>
+      <div class="actions"><button class="gold" onclick="autopilot()">🤖 Run Autopilot</button></div></div>
+    <div class="row-main">
+      <div class="card"><h3>Due soon & overdue</h3><div class="scroll">
+        <table><thead><tr><th>Client</th><th>Amount</th><th>Due</th><th>Stage</th><th></th></tr></thead><tbody id="followups"></tbody></table></div></div>
+      <div class="card"><h3>How Autopilot works</h3>
+        <ol class="steps">
+          <li>Looks for invoices that became <b>PAID</b> and works out the tax set-aside.</li>
+          <li>Finds invoices <b>due within 3 days</b> or <b>overdue</b>.</li>
+          <li>Writes each reminder in a fitting tone: friendly heads-up, polite nudge, then firm.</li>
+          <li><b>Stops for your approval</b> on every email. You can edit the message first.</li>
+          <li>Backend guardrails block reminders for paid or unknown invoices.</li>
+        </ol></div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Other sources <small>Upwork, bank statements & more</small></h2>
+  <!-- TAX -->
+  <section class="page" id="p-tax">
+    <div class="ph"><div><h2>Tax</h2><p>Deterministic calculator (Income Tax Act 2025, new regime). The AI explains it but never computes the numbers.</p></div>
+      <div class="actions"><button class="primary" onclick="ask('Explain my tax estimate and how much I should set aside')">Ask the Tax advisor</button></div></div>
+    <div class="row2">
+      <div class="card"><h3>Presumptive vs regular <small id="ftype"></small></h3>
+        <table class="compare-tbl"><tbody id="taxCompareTbl"></tbody></table>
+        <p class="muted" style="font-size:12.5px;margin:10px 0 0" id="taxDeadline2"></p></div>
+      <div class="card"><h3>Assumptions</h3><div class="scroll" style="max-height:190px"><ul class="assume" id="assumptions"></ul></div>
+        <p class="muted" style="font-size:12.5px;margin:8px 0 0">Estimate only. Confirm with a CA before filing.</p></div>
+    </div>
+    <div class="card grow"><h3>📚 Tax rules library <small>RAG · the same passages the Tax advisor retrieves and cites</small></h3>
+      <form id="rulesForm" style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="rq" placeholder="e.g. Do I need GST registration for foreign clients?" style="flex:1;font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)">
+        <button class="primary">Search rules</button>
+        <button type="button" onclick="askRules()">Ask the advisor →</button></form>
+      <div class="chips" style="padding:0 0 8px" id="ruleChips"><button>When is advance tax due?</button><button>Do I need GST registration?</button><button>Is content writing a specified profession?</button><button>Which purpose code for web development?</button></div>
+      <div class="scroll" id="rules"><div class="empty">Search the knowledge base: Section 58, advance tax, slabs & rebate, GST & LUT, purpose codes, FIRC, ITR.</div></div>
+    </div>
+  </section>
+
+  <!-- STATEMENTS -->
+  <section class="page" id="p-statements">
+    <div class="ph"><div><h2>Statements</h2><p>AI reads Upwork and bank statements, finds client payments and fees, and catches payouts you've already counted.</p></div></div>
     <div class="drop" id="drop">
-      <b>Drop a statement here</b> (CSV, TXT or PDF): Munshi's AI reads it, finds client payments and fees,
-      and spots payouts you've already counted.
-      <div class="row">
-        <label><button class="primary" onclick="document.getElementById('file').click()">Choose file</button></label>
+      <b>Drop a statement here</b> (CSV, TXT or PDF)
+      <div class="btnrow">
+        <button class="primary" onclick="document.getElementById('file').click()">Choose file</button>
         <input type="file" id="file" hidden accept=".csv,.txt,.pdf">
         <button onclick="trySample('upwork_statement.csv')">Try sample: Upwork</button>
         <button onclick="trySample('hdfc_bank_statement.csv')">Try sample: HDFC bank</button>
-        <button onclick="resetImports()" title="Clear imported entries">Clear imports</button>
+        <button onclick="resetImports()">Clear imports</button>
       </div>
     </div>
     <div class="toast" id="toast"></div>
-    <table style="margin-top:14px"><thead><tr><th>Date</th><th>Source</th><th>From / description</th><th>Amount</th><th>In ₹</th></tr></thead>
-      <tbody id="entries"><tr><td colspan="5" class="empty">Nothing imported yet.</td></tr></tbody></table>
+    <div class="card grow"><div class="scroll">
+      <table><thead><tr><th>Date</th><th>Source</th><th>From / description</th><th>Amount</th><th>In ₹</th></tr></thead>
+        <tbody id="entries"></tbody></table></div></div>
   </section>
-  <section class="card">
-    <h2>Approval audit log <small>every money / client-touching action, enforced in the backend</small></h2>
-    <table><thead><tr><th>When (UTC)</th><th>Action</th><th>Decision</th><th>Result</th></tr></thead>
-      <tbody id="audit"><tr><td colspan="4" class="empty">No approvals yet.</td></tr></tbody></table>
+
+  <!-- AUDIT -->
+  <section class="page" id="p-audit">
+    <div class="ph"><div><h2>Approvals log</h2><p>Every action that emails a client or bills money needs your approval. It's enforced in the backend and recorded here.</p></div></div>
+    <div class="card grow"><div class="scroll">
+      <table><thead><tr><th>When (UTC)</th><th>Action</th><th>Details</th><th>Decision</th><th>Result</th></tr></thead>
+        <tbody id="audit"></tbody></table></div></div>
   </section>
-  <footer>Estimates only: new tax regime, Income Tax Act 2025. Confirm with a CA before filing. Sandbox demo, no real money moves.</footer>
 </main>
 
-<aside class="card chat">
-  <div class="head"><h2>Ask Munshi</h2><p>A team of AI agents (Billing, Collections, Tax, Statements). Nothing reaches a client without your OK.</p></div>
+<aside>
+  <div class="head"><h2>Ask Munshi</h2><p>Four agents: Billing, Collections, Tax and Statements. Nothing reaches a client without your OK.</p></div>
   <div class="msgs" id="msgs">
-    <div class="msg bot">Namaste! I'm Munshi 🙏 I can send PayPal invoices to your clients, chase late payments, and tell you how much tax to keep aside. What shall we do?</div>
+    <div class="msg bot">Namaste! I'm Munshi 🙏 I can bill your clients through PayPal, chase late payments and tell you how much tax to keep aside. What shall we do?</div>
   </div>
   <div class="chips" id="chips">
-    <button>Bill a new client</button>
-    <button>Who hasn't paid me yet?</button>
-    <button>How much tax will I owe this year?</button>
+    <button>Bill a new client</button><button>Who hasn't paid me yet?</button><button>How much tax will I owe?</button>
   </div>
   <form class="ask" id="ask"><input id="q" placeholder="e.g. Bill Acme $1,200 for a landing page" autocomplete="off"><button class="primary">Send</button></form>
 </aside>
@@ -190,166 +294,197 @@
 const inr = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);
 const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const $ = id => document.getElementById(id);
-
-function showErr(m){ $('err').textContent = m; $('err').style.display = m ? 'block':'none'; }
-
-async function load(){
-  try{
-    const r = await fetch('/api/summary'); const s = await r.json();
-    if(!r.ok) throw new Error(s.detail || 'Could not load');
-    showErr('');
-    render(s); loadAudit();
-  }catch(e){ showErr('Could not reach PayPal: ' + e.message); }
-}
-
-function render(s){
-  const t = s.tax;
-  $('fy').textContent = 'FY ' + t.financial_year;
-  $('fx').textContent = '$1 = ₹' + s.usd_inr;
-  $('taxBig').textContent = inr(t.estimated_annual_tax_inr);
-  if (t.recommended === 'presumptive' && t.tax_if_regular_inr > t.tax_if_presumptive_inr){
-    $('taxCompare').innerHTML = `with the <b>presumptive scheme</b> (Sec 58), vs <b>${inr(t.tax_if_regular_inr)}</b> the regular way. You save <b>${inr(t.tax_if_regular_inr - t.tax_if_presumptive_inr)}</b>.`;
-  } else {
-    $('taxCompare').innerHTML = `Recommended: <b>${t.recommended}</b> method (new regime).`;
-  }
-  $('projected').textContent = inr(t.projected_annual_receipts_inr);
-  $('setAside').textContent = t.set_aside_percent_of_each_payment + '%';
-  $('deadline').textContent = t.advance_tax_deadline;
-  $('kReceived').textContent = inr(s.received_inr);
-  $('kPending').textContent = inr(s.pending_inr);
-  $('kFees').textContent = inr(s.fees_inr);
-  $('kOverdue').textContent = s.overdue.length;
-
-  const src = Object.entries(s.by_source).sort((a,b)=>b[1]-a[1]);
-  const max = Math.max(1, ...src.map(x=>x[1]));
-  $('sources').innerHTML = src.length ? src.map(([k,v])=>
-    `<div class="bar"><span>${esc(k)}</span><div class="track"><div class="fill" style="width:${100*v/max}%"></div></div><span class="amt num">${inr(v)}</span></div>`).join('')
-    : '<div class="empty">No income yet. Send an invoice or import a statement.</div>';
-
-  const overdueIds = new Set(s.overdue.map(i=>i.invoice_id));
-  $('invoices').innerHTML = s.invoices.length ? s.invoices.map(i=>{
-    const od = overdueIds.has(i.invoice_id);
-    const st = od ? 'OVERDUE' : i.status;
-    const canRemind = ['SENT','UNPAID'].includes(i.status);
-    return `<tr class="${od?'overdue':''}"><td>${esc(i.client)}<br><small style="color:var(--muted)">${esc(i.invoice_id)}</small></td>
-      <td class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</td><td class="num">${inr(i.amount_inr)}</td>
-      <td>${esc(i.due_date||'—')}</td><td><span class="status s-${st}">${st.replace('_',' ')}</span></td>
-      <td>${canRemind?`<button onclick="ask('Send a polite payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button>`:''}</td></tr>`;
-  }).join('') : '<tr><td colspan="6" class="empty">No invoices yet. Ask Munshi to bill a client →</td></tr>';
-
-  $('entries').innerHTML = s.entries.length ? s.entries.map(e=>{
-    const dup = !!e.duplicate_of, fee = e.entry_type==='fee';
-    return `<tr><td>${esc(e.date)}</td><td>${esc(e.source)}</td>
-      <td>${esc(e.payer)}${e.payer&&e.description?' · ':''}<small>${esc(e.description)}</small>
-        ${dup?`<span class="dupnote">✓ Already counted: ${esc(e.duplicate_of)}</span>`:''}</td>
-      <td class="num ${dup?'dup':''}">${fee?'− ':''}${esc(e.currency)} ${Number(e.amount).toLocaleString('en-IN')}</td>
-      <td class="num ${dup?'dup':''}">${fee?'− ':''}${inr(e.amount_inr)}</td></tr>`;
-  }).join('') : '<tr><td colspan="5" class="empty">Nothing imported yet.</td></tr>';
-}
-
-async function loadAudit(){
-  try{ const rows = await (await fetch('/api/audit')).json();
-    $('audit').innerHTML = rows.length ? rows.map(r=>{
-      let res=''; try{ const j=JSON.parse(r.result||'{}'); res = j.error ? '⚠ '+j.error : (j.invoice_id ? 'sent '+j.invoice_id : (j.reminder_sent?'reminder sent':'')); }catch(e){}
-      const dec = r.decision==='reject' ? '<span class="status s-OVERDUE">rejected</span>' : `<span class="status s-PAID">${r.decision==='edit'?'edited & approved':'approved'}</span>`;
-      return `<tr><td>${esc(r.created_at)}</td><td>${esc(TOOL_NAMES[r.tool]||r.tool)}</td><td>${dec}</td><td><small>${esc(res)}</small></td></tr>`;
-    }).join('') : '<tr><td colspan="4" class="empty">No approvals yet.</td></tr>';
-  }catch(e){}
-}
-// ---- uploads ----
-async function uploadFile(file){
-  $('toast').style.display='block'; $('toast').textContent = `🤖 Munshi is reading ${file.name}…`;
-  const fd = new FormData(); fd.append('file', file);
-  try{
-    const r = await fetch('/api/upload',{method:'POST',body:fd}); const d = await r.json();
-    if(!r.ok) throw new Error(d.detail);
-    const inc = d.added.filter(a=>a.entry_type==='income' && !a.duplicate_of).length;
-    const fees = d.added.filter(a=>a.entry_type==='fee').length;
-    let msg = `✓ ${d.source}: found ${inc} client payment(s)` + (fees?` and ${fees} fee(s)`:'') + '.';
-    if (d.duplicates_caught.length) msg += ` Caught ${d.duplicates_caught.length} payout(s) you'd already counted, so they won't be taxed twice.`;
-    if (!d.added.length) msg = `Nothing new in ${d.source}. Everything was already imported.`;
-    $('toast').textContent = msg;
-    load();
-  }catch(e){ $('toast').textContent = '⚠ ' + e.message; }
-}
-async function trySample(name){
-  const r = await fetch('/samples/' + name); const blob = await r.blob();
-  uploadFile(new File([blob], name, {type:'text/csv'}));
-}
-async function resetImports(){ await fetch('/api/reset-imports',{method:'POST'}); $('toast').style.display='none'; load(); }
-$('file').onchange = e => e.target.files[0] && uploadFile(e.target.files[0]);
-const drop = $('drop');
-['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
-['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
-drop.addEventListener('drop', e => e.dataTransfer.files[0] && uploadFile(e.dataTransfer.files[0]));
-
-// ---- chat (multi-agent + human approval) ----
 const AGENT_NAMES = {billing:'💸 Billing agent', collections:'🔍 Collections agent', tax:'📊 Tax advisor', statement:'📄 Statement agent'};
 const TOOL_NAMES = {create_and_send_invoice:'PayPal · send invoice', list_invoices:'PayPal · list invoices',
   send_reminder:'PayPal · send reminder', get_income_and_tax:'Ledger · income & tax', find_invoices_needing_followup:'PayPal · find overdue',
   get_payment_updates:'PayPal · new payments', list_imported_entries:'Ledger · statements', search_tax_rules:'RAG · tax rules'};
-const EDITABLE = {create_and_send_invoice:['client_name','client_email','description','amount','currency','due_in_days','note'], send_reminder:['note']};
-let session = null;
-function addMsg(cls, html){ const d=document.createElement('div'); d.className='msg '+cls; d.innerHTML=html; $('msgs').appendChild(d); $('msgs').scrollTop=1e9; return d; }
+let session = null, S = null;
+
+// ---------- navigation ----------
+function go(page){
+  document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active', a.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='p-'+page));
+  history.replaceState(null,'','#'+page);
+  if (page==='audit') loadAudit();
+}
+document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>go(a.dataset.page));
+function showErr(m){ $('err').textContent=m; $('err').style.display=m?'block':'none'; }
+
+// ---------- data ----------
+async function load(){
+  try{ const r=await fetch('/api/summary'); const s=await r.json(); if(!r.ok) throw new Error(s.detail||'Could not load');
+    showErr(''); S=s; render(s); loadAudit(); }
+  catch(e){ showErr('Could not reach PayPal: '+e.message); }
+}
+const daysTo = d => d ? Math.round((new Date(d) - new Date(new Date().toDateString()))/864e5) : null;
+
+function render(s){
+  const t=s.tax;
+  $('fy').textContent='FY '+t.financial_year; $('fx').textContent='$1 = ₹'+s.usd_inr;
+  $('taxBig').textContent=inr(t.estimated_annual_tax_inr);
+  const saves = t.tax_if_regular_inr - (t.tax_if_presumptive_inr ?? t.tax_if_regular_inr);
+  $('taxCompare').innerHTML = (t.recommended==='presumptive' && saves>0)
+    ? `with the <b>presumptive scheme</b> (Sec 58), vs <b>${inr(t.tax_if_regular_inr)}</b> the regular way. You save <b>${inr(saves)}</b>.`
+    : `Recommended: <b>${t.recommended}</b> method (new regime).`;
+  $('projected').textContent=inr(t.projected_annual_receipts_inr);
+  $('setAside').textContent=t.set_aside_percent_of_each_payment+'%';
+  $('deadline').textContent=t.advance_tax_deadline;
+  $('kReceived').textContent=inr(s.received_inr); $('kPending').textContent=inr(s.pending_inr);
+  $('kFees').textContent=inr(s.fees_inr); $('kOverdue').textContent=s.overdue.length;
+  $('kOverdueBox').classList.toggle('alert', s.overdue.length>0);
+  $('navOverdue').textContent=s.overdue.length; $('navOverdue').style.display=s.overdue.length?'inline':'none';
+
+  const src=Object.entries(s.by_source).sort((a,b)=>b[1]-a[1]); const max=Math.max(1,...src.map(x=>x[1]));
+  $('sources').innerHTML = src.length ? src.map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><div class="track"><div class="fill" style="width:${100*v/max}%"></div></div><span class="amt num">${inr(v)}</span></div>`).join('')
+    : '<div class="empty">No income yet. Send an invoice or import a statement.</div>';
+
+  const open = s.invoices.filter(i=>['SENT','UNPAID','PARTIALLY_PAID'].includes(i.status));
+  const follow = open.map(i=>({...i, d:daysTo(i.due_date)})).filter(i=>i.d!==null && i.d<=3).sort((a,b)=>a.d-b.d);
+  $('attention').innerHTML = follow.length ? follow.map(i=>`<div class="attn"><span class="status ${i.d<0?'s-OVERDUE':'s-DUE_SOON'}">${i.d<0?(-i.d)+'d overdue':(i.d===0?'due today':'due in '+i.d+'d')}</span>
+      <span class="what">${esc(i.client)} · <span class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</span></span>
+      <button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button></div>`).join('')
+      + `<div style="margin-top:10px"><button class="gold" onclick="autopilot()">🤖 Let Autopilot handle these</button></div>`
+    : '<div class="empty">🎉 Nothing due or overdue. Every client is on time.</div>';
+
+  const od=new Set(s.overdue.map(i=>i.invoice_id));
+  $('invoices').innerHTML = s.invoices.length ? s.invoices.map(i=>{
+    const st = od.has(i.invoice_id)?'OVERDUE':i.status;
+    return `<tr class="${od.has(i.invoice_id)?'overdue':''}"><td>${esc(i.client)}<br><small class="muted">${esc(i.invoice_id)}</small></td>
+      <td class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</td><td class="num">${inr(i.amount_inr)}</td>
+      <td>${esc(i.invoice_date||'—')}</td><td>${esc(i.due_date||'—')}</td><td><span class="status s-${st}">${st.replace(/_/g,' ')}</span></td>
+      <td>${['SENT','UNPAID'].includes(i.status)?`<button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button>`:''}</td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="empty">No invoices yet. Click "+ New invoice".</td></tr>';
+
+  $('followups').innerHTML = follow.length ? follow.map(i=>`<tr class="${i.d<0?'overdue':''}"><td>${esc(i.client)}</td>
+      <td class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</td><td>${esc(i.due_date)}</td>
+      <td><span class="status ${i.d<0?'s-OVERDUE':'s-DUE_SOON'}">${i.d<0?(-i.d)+' days overdue':'due soon'}</span></td>
+      <td><button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button></td></tr>`).join('')
+    : '<tr><td colspan="5" class="empty">Nothing to chase right now.</td></tr>';
+
+  const rows=[['Presumptive (50% of receipts)', t.tax_if_presumptive_inr, 'presumptive'], ['Regular (receipts − expenses)', t.tax_if_regular_inr, 'regular']];
+  $('taxCompareTbl').innerHTML = `<tr><td>Receipts so far</td><td class="v num">${inr(t.receipts_so_far_inr)}</td></tr>
+    <tr><td>Projected for the year</td><td class="v num">${inr(t.projected_annual_receipts_inr)}</td></tr>` +
+    rows.map(([l,v,k])=>`<tr class="${t.recommended===k?'best':''}"><td>${l}${t.recommended===k?' ✓ recommended':''}</td><td class="v num">${v==null?'not eligible':inr(v)}</td></tr>`).join('');
+  $('taxDeadline2').textContent='📅 '+t.advance_tax_deadline;
+  $('ftype').textContent = t.freelancer_type==='business' ? 'business scheme · 6%' : 'specified profession · 50%';
+  $('assumptions').innerHTML=(t.assumptions||[]).map(a=>`<li>${esc(a)}</li>`).join('');
+
+  $('entries').innerHTML = s.entries.length ? s.entries.map(e=>{ const dup=!!e.duplicate_of, fee=e.entry_type==='fee';
+    return `<tr><td>${esc(e.date)}</td><td>${esc(e.source)}</td><td>${esc(e.payer)}${e.payer&&e.description?' · ':''}<small>${esc(e.description)}</small>
+      ${dup?`<span class="dupnote">✓ Already counted: ${esc(e.duplicate_of)}</span>`:''}</td>
+      <td class="num ${dup?'dup':''}">${fee?'− ':''}${esc(e.currency)} ${Number(e.amount).toLocaleString('en-IN')}</td>
+      <td class="num ${dup?'dup':''}">${fee?'− ':''}${inr(e.amount_inr)}</td></tr>`; }).join('')
+    : '<tr><td colspan="5" class="empty">Nothing imported yet. Try a sample above.</td></tr>';
+}
+
+async function loadAudit(){
+  try{ const rows=await (await fetch('/api/audit')).json();
+    $('audit').innerHTML = rows.length ? rows.map(r=>{
+      let res='', det=''; try{ const j=JSON.parse(r.result||'{}'); res=j.error?'⚠ '+j.error:(j.invoice_id?'sent '+j.invoice_id:(j.reminder_sent?'reminder sent':'')); }catch(e){}
+      try{ const a=JSON.parse(r.args||'{}'); det=a.client_name?`${a.client_name} · ${a.currency||'USD'} ${a.amount}`:(a.invoice_id||''); }catch(e){}
+      const dec = r.decision==='reject'?'<span class="status s-rejected">rejected</span>':`<span class="status s-approved">${r.decision==='edit'?'edited & approved':'approved'}</span>`;
+      return `<tr><td>${esc(r.created_at)}</td><td>${esc(TOOL_NAMES[r.tool]||r.tool)}</td><td>${esc(det)}</td><td>${dec}</td><td><small>${esc(res)}</small></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty">No approvals yet.</td></tr>';
+  }catch(e){}
+}
+
+// ---------- RAG rules library ----------
+async function searchRules(q){
+  if(!q.trim()) return; $('rq').value=q;
+  const d=await (await fetch('/api/rules?q='+encodeURIComponent(q))).json();
+  $('rules').innerHTML = (d.results||[]).length ? d.results.map(r=>`<div class="rule"><span class="sc">BM25 ${r.score}</span><div class="rt">${esc(r.cite)}</div>
+     <div>${esc(r.text)}</div><div class="rs">Sources: ${esc(r.sources)}</div></div>`).join('') : '<div class="empty">No matching rule. Ask a CA.</div>';
+}
+function askRules(){ const q=$('rq').value.trim(); if(q) ask(q); }
+$('rulesForm').onsubmit=e=>{ e.preventDefault(); searchRules($('rq').value); };
+$('ruleChips').onclick=e=>{ if(e.target.tagName==='BUTTON') searchRules(e.target.textContent); };
+
+// ---------- statements ----------
+async function uploadFile(file){
+  go('statements'); $('toast').style.display='block'; $('toast').textContent=`🤖 Munshi is reading ${file.name}…`;
+  const fd=new FormData(); fd.append('file',file);
+  try{ const r=await fetch('/api/upload',{method:'POST',body:fd}); const d=await r.json(); if(!r.ok) throw new Error(d.detail);
+    const inc=d.added.filter(a=>a.entry_type==='income'&&!a.duplicate_of).length, fees=d.added.filter(a=>a.entry_type==='fee').length;
+    let msg=`✓ ${d.source}: found ${inc} client payment(s)`+(fees?` and ${fees} fee(s)`:'')+'.';
+    if(d.duplicates_caught.length) msg+=` Caught ${d.duplicates_caught.length} payout(s) you'd already counted, so they won't be taxed twice.`;
+    if(!d.added.length) msg=`Nothing new in ${d.source}. Everything was already imported.`;
+    $('toast').textContent=msg; load();
+  }catch(e){ $('toast').textContent='⚠ '+e.message; }
+}
+async function trySample(n){ const b=await (await fetch('/samples/'+n)).blob(); uploadFile(new File([b],n,{type:'text/csv'})); }
+async function resetImports(){ await fetch('/api/reset-imports',{method:'POST'}); $('toast').style.display='none'; load(); }
+$('file').onchange=e=>e.target.files[0]&&uploadFile(e.target.files[0]);
+const drop=$('drop');
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>e.dataTransfer.files[0]&&uploadFile(e.dataTransfer.files[0]));
+
+// ---------- chat + approvals ----------
+const FIELDS = {
+  create_and_send_invoice:[['client_name','Client'],['client_email','Email'],['amount','Amount'],['currency','Currency'],
+                           ['due_in_days','Due in (days)'],['description','Work','full'],['note','Note on invoice','full',true]],
+  send_reminder:[['invoice_id','Invoice'],['note','Reminder message','full',true]]};
+function addMsg(cls,html){ const d=document.createElement('div'); d.className='msg '+cls; d.innerHTML=html; $('msgs').appendChild(d); $('msgs').scrollTop=1e9; return d; }
 function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s)]+)/g,'<a href="$1" target="_blank">$1</a>'); }
 function traceHtml(trace){
   return (trace||[]).map(t=>{
-    if (t.agent==='supervisor'){ const a=(t.event.split('→ ')[1]||'').trim(); return `<span class="agent" title="${esc(t.why||'')}">${esc(AGENT_NAMES[a]||t.event)}</span>`; }
-    const cls = /approved/.test(t.event)?'ok':(/rejected|blocked/.test(t.event)?'no':'');
-    const mark = /approved/.test(t.event)?' ✓ you approved':(t.event==='rejected'?' ✗ you rejected':(/blocked/.test(t.event)?' ⛔ blocked by validation':''));
+    if(t.agent==='supervisor'){ const a=(t.event.split('→ ')[1]||'').trim(); return `<span class="agent" title="${esc(t.why||'')}">${esc(AGENT_NAMES[a]||t.event)}</span>`; }
+    const cls=/approved/.test(t.event)?'ok':(/rejected|blocked/.test(t.event)?'no':'');
+    const mark=/approved/.test(t.event)?' ✓ approved':(t.event==='rejected'?' ✗ rejected':(/blocked/.test(t.event)?' ⛔ blocked by validation':''));
     return `<span class="tool ${cls}">⚙ ${esc(TOOL_NAMES[t.tool]||t.tool)}${mark}</span>`;
   }).join('');
 }
-function render_reply(el, d){
-  session = d.session_id;
-  const tr = traceHtml(d.trace);
-  el.innerHTML = (tr?`<div class="tools">${tr}</div>`:'') + (d.reply?fmt(d.reply):(d.pending?'<i>Waiting for your approval…</i>':''));
-  if (d.pending) approvalCard(d.pending);
-  if ((d.trace||[]).some(t=>/approved|rejected/.test(t.event))) load();
+function actionForm(el, p, tr){
+  // The agent's message IS the editable approval form, so nothing is shown twice.
+  const title = p.tool==='create_and_send_invoice' ? `Ready to send: invoice to ${esc(p.args.client_name||'client')}`
+              : p.tool==='send_reminder' ? `Ready to send: payment reminder` : esc(p.summary);
+  const fields=(FIELDS[p.tool]||[]).map(([k,label,full,long])=>{ const v=p.args[k]??(k==='currency'?'USD':(k==='due_in_days'?15:''));
+    return `<div class="${full?'full':''}"><label>${label}</label>${long?`<textarea data-k="${k}">${esc(v)}</textarea>`:`<input data-k="${k}" value="${esc(v)}" ${k==='invoice_id'?'readonly':''}>`}</div>`; }).join('');
+  el.classList.add('action');
+  el.innerHTML = (tr?`<div class="tools">${tr}</div>`:'') +
+    `<div class="act-title">✉️ ${title}<span class="tag">needs your OK</span></div><div class="fgrid">${fields}</div>
+     <div class="act-btns"><button class="primary" data-d="approve">✓ Approve & send</button><button data-d="reject">✗ Reject</button>
+     <span class="hint">Edit any field, then approve</span></div>`;
+  el.querySelectorAll('button[data-d]').forEach(b=>b.onclick=()=>decide(el,p,b.dataset.d));
 }
-function approvalCard(p){
-  const fields = (EDITABLE[p.tool]||[]).filter(k=>k in p.args || k==='note');
-  const card = document.createElement('div'); card.className='approval';
-  card.innerHTML = `<div class="t">⏸ Approval needed · ${esc(AGENT_NAMES[p.agent]||p.agent)}</div><div>${esc(p.summary)}</div>` +
-    fields.map(k=>{ const v = p.args[k]??''; const long = k==='note'||k==='description';
-      return `<label>${esc(k.replace(/_/g,' '))}</label>` + (long?`<textarea data-k="${k}">${esc(v)}</textarea>`:`<input data-k="${k}" value="${esc(v)}">`); }).join('') +
-    `<div class="btns"><button class="primary" data-d="approve">✓ Approve & send</button><button data-d="reject">✗ Reject</button></div>`;
-  card.querySelectorAll('button').forEach(b=>b.onclick=()=>decide(card, p, b.dataset.d));
-  $('msgs').appendChild(card); $('msgs').scrollTop=1e9;
+function render_reply(el,d){
+  session=d.session_id; const tr=traceHtml(d.trace);
+  if(d.pending){ actionForm(el,d.pending,tr); }
+  else { el.classList.remove('action'); el.innerHTML=(tr?`<div class="tools">${tr}</div>`:'')+fmt(d.reply||''); }
+  $('msgs').scrollTop=1e9;
+  if((d.trace||[]).some(t=>/approved|rejected/.test(t.event))) load();
 }
-async function decide(card, p, choice){
+async function decide(card,p,choice){
   card.classList.add('done');
-  let body = {session_id: session, decision: choice};
-  if (choice==='approve'){
-    const edits = {}; card.querySelectorAll('[data-k]').forEach(i=>{
-      let v=i.value; const k=i.dataset.k; if(['amount','due_in_days'].includes(k)) v=Number(v);
-      if (String(v)!==String(p.args[k]??'')) edits[k]=v; });
-    if (Object.keys(edits).length){ body.decision='edit'; body.args=edits; }
-  } else { body.reason = prompt('What should change? (optional)') || ''; }
-  const wait = addMsg('bot', '<span class="typing">'+(choice==='reject'?'Cancelling…':'Sending via PayPal…')+'</span>');
-  try{ const r = await fetch('/api/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    render_reply(wait, await r.json()); }catch(e){ wait.textContent='Network error: '+e.message; }
+  const body={session_id:session, decision:choice};
+  if(choice==='approve'){ const edits={};
+    card.querySelectorAll('[data-k]').forEach(i=>{ const k=i.dataset.k; let v=i.value; if(['amount','due_in_days'].includes(k)) v=Number(v);
+      if(String(v)!==String(p.args[k]??'')) edits[k]=v; });
+    if(Object.keys(edits).length){ body.decision='edit'; body.args=edits; }
+  } else body.reason=prompt('What should change? (optional)')||'';
+  const wait=addMsg('bot',`<span class="typing">${choice==='reject'?'Cancelling…':'Sending via PayPal…'}</span>`);
+  try{ const r=await fetch('/api/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); render_reply(wait,await r.json()); }
+  catch(e){ wait.textContent='Network error: '+e.message; }
 }
-async function ask(text){
+async function post(url, body, el){
+  try{ const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); render_reply(el,await r.json()); }
+  catch(e){ el.textContent='Network error: '+e.message; }
+}
+function ask(text){
   if(!text.trim()) return;
-  document.querySelectorAll('.approval:not(.done)').forEach(c=>c.classList.add('done')); // new message cancels old card
-  addMsg('user', esc(text));
-  const wait = addMsg('bot', '<span class="typing">Munshi\'s agents are working…</span>');
-  try{
-    const r = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text, session_id:session})});
-    render_reply(wait, await r.json());
-  }catch(e){ wait.textContent = 'Network error: ' + e.message; }
+  document.querySelectorAll('.msg.action:not(.done)').forEach(c=>c.classList.add('done'));
+  addMsg('user',esc(text));
+  post('/api/chat',{message:text,session_id:session}, addMsg('bot','<span class="typing">Munshi\'s agents are working…</span>'));
 }
-async function autopilot(){
-  addMsg('user', '🤖 Run Autopilot: check payments & chase overdue invoices');
-  const wait = addMsg('bot', '<span class="typing">Collections agent is checking your PayPal invoices…</span>');
-  try{ const r = await fetch('/api/autopilot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:session})});
-    render_reply(wait, await r.json()); }catch(e){ wait.textContent='Network error: '+e.message; }
+function autopilot(){
+  go('collections');
+  addMsg('user','🤖 Run Autopilot: check payments & chase late invoices');
+  post('/api/autopilot',{session_id:session}, addMsg('bot','<span class="typing">Collections agent is checking PayPal…</span>'));
 }
-$('ask').onsubmit = e => { e.preventDefault(); const v=$('q').value; $('q').value=''; ask(v); };
-$('chips').onclick = e => { if(e.target.tagName==='BUTTON') ask(e.target.textContent); };
-load();
+function prefill(t){ $('q').value=t; $('q').focus(); }
+$('ask').onsubmit=e=>{ e.preventDefault(); const v=$('q').value; $('q').value=''; ask(v); };
+$('chips').onclick=e=>{ if(e.target.tagName==='BUTTON') ask(e.target.textContent); };
+go((location.hash||'#dashboard').slice(1)); load();
 </script>
 </body>
 </html>
