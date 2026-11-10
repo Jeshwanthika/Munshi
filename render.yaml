@@ -1,0 +1,34 @@
+# Render blueprint (optional): Dashboard -> New -> Blueprint -> pick this repo.
+services:
+  - type: web
+    name: munshi
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /login
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: FREELANCER_TYPE
+        value: profession
+      - key: USD_INR
+        value: "94"
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: SANDBOX_CLIENT_EMAIL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: MUNSHI_USERNAME
+        sync: false
+      - key: MUNSHI_PASSWORD_HASH
+        sync: false
+      - key: MUNSHI_SECRET_KEY
+        generateValue: true
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
