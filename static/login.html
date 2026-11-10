@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · Munshi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+  :root{--brand:#0B5D3B;--brand-dark:#063D27;--brand-ink:#04291A;--gold:#C9A227;--bg:#F4F7F4;--line:#DCE6DF;--ink:#13261C;--muted:#5E6F66;--red:#B3261E;--red-soft:#FBE9E7}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;color:var(--ink);display:grid;grid-template-columns:1.1fr 1fr;background:var(--bg)}
+  .side{background:linear-gradient(150deg,var(--brand-ink),var(--brand) 75%);color:#E3F1E9;padding:56px 64px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .side:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 31px,rgba(255,255,255,.05) 31px 32px)}
+  .brand{display:flex;align-items:baseline;gap:10px;position:relative;z-index:1}
+  .brand h1{font:700 40px "Fraunces",serif;margin:0;color:#fff}
+  .brand span{font-family:"Tiro Devanagari Hindi",serif;font-size:28px;color:var(--gold)}
+  .pitch{margin-top:auto;position:relative;z-index:1;max-width:460px}
+  .pitch h2{font:700 30px/1.25 "Fraunces",serif;color:#fff;margin:0 0 14px}
+  .pitch li{margin:8px 0;list-style:none}
+  .pitch li:before{content:"✓";color:var(--gold);font-weight:700;margin-right:10px}
+  .pitch ul{padding:0;margin:0 0 28px}
+  .fine{font-size:12.5px;color:#9DBCAB;position:relative;z-index:1}
+  .form-wrap{display:flex;align-items:center;justify-content:center;padding:40px}
+  form{width:100%;max-width:360px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px}
+  form h3{font:700 24px "Fraunces",serif;margin:0 0 4px}
+  form p{margin:0 0 22px;color:var(--muted);font-size:14px}
+  label{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
+  input{width:100%;font:inherit;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+  input:focus{outline:2px solid var(--gold);border-color:transparent;background:#fff}
+  button{width:100%;margin-top:22px;font:600 15px "IBM Plex Sans";padding:12px;border-radius:9px;border:none;background:var(--brand);color:#fff;cursor:pointer}
+  button:hover{background:var(--brand-dark)} button:disabled{opacity:.6;cursor:wait}
+  .err{display:none;background:var(--red-soft);color:var(--red);border-radius:8px;padding:9px 12px;font-size:13.5px;margin-top:14px}
+  .lock{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:18px;font-size:12.5px;color:var(--muted)}
+  @media(max-width:860px){body{grid-template-columns:1fr}.side{padding:32px}.pitch{display:none}}
+</style>
+</head>
+<body>
+  <section class="side">
+    <div class="brand"><h1>Munshi</h1><span>मुंशी</span></div>
+    <div class="pitch">
+      <h2>Your AI accountant for getting paid from abroad.</h2>
+      <ul>
+        <li>Bill clients through PayPal in plain words</li>
+        <li>Every payment source in one ledger, no double counting</li>
+        <li>Your tax, worked out under the Income-tax Act 2025</li>
+        <li>Nothing reaches a client without your approval</li>
+      </ul>
+    </div>
+    <div class="fine">PayPal sandbox demo · no real money moves</div>
+  </section>
+  <section class="form-wrap">
+    <form id="f" autocomplete="on">
+      <h3>Sign in</h3>
+      <p>Your books contain private income data.</p>
+      <label for="u">Username</label><input id="u" name="username" autocomplete="username" required autofocus>
+      <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required>
+      <button id="b">Sign in</button>
+      <div class="err" id="e"></div>
+      <div class="lock">🔒 Encrypted session · 12-hour sign-in · lockout after 5 failed tries</div>
+    </form>
+  </section>
+<script>
+document.getElementById('f').onsubmit = async e => {
+  e.preventDefault();
+  const b = document.getElementById('b'), err = document.getElementById('e');
+  b.disabled = true; b.textContent = 'Signing in…'; err.style.display = 'none';
+  try {
+    const r = await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username: document.getElementById('u').value, password: document.getElementById('p').value})});
+    if (r.ok) { location.href = '/'; return; }
+    err.textContent = (await r.json()).detail || 'Sign-in failed'; err.style.display = 'block';
+  } catch (x) { err.textContent = 'Network error'; err.style.display = 'block'; }
+  b.disabled = false; b.textContent = 'Sign in';
+};
+</script>
+</body>
+</html>

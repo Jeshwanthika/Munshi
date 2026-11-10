@@ -47,9 +47,11 @@ import os
 
 KIND = os.getenv("FREELANCER_TYPE", "profession")   # profession (IT, engineering, consulting...) | business
 BUSINESS_RATE, BUSINESS_LIMIT = 0.06, 30_000_000    # Sec 58 business scheme: 6% of digital receipts, 3 crore
+GST_THRESHOLD = 2_000_000                            # GST registration: Rs 20 lakh services turnover
+ADVANCE_TAX_MIN = 10_000                             # advance tax needed only if tax after TDS >= Rs 10,000
 
 
-def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None):
+def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None, tds_inr=0.0):
     """Compare presumptive vs regular (receipts - expenses) for this FY.
     kind='profession': specified profession, 50% of receipts (limit 75 lakh)
     kind='business'  : non-specified work, 6% of digital receipts (limit 3 crore)"""
@@ -72,6 +74,8 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None):
     # on a tie prefer presumptive: same tax, no books of accounts needed
     best = min(options, key=lambda k: (options[k], k != "presumptive"))
     best_tax = options[best]
+    tds_inr = round(tds_inr or 0)
+    after_tds = max(0, best_tax - tds_inr)
 
     return {
         "freelancer_type": kind,
@@ -84,8 +88,12 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None):
         "tax_if_regular_inr": tax_regular,
         "recommended": best,
         "estimated_annual_tax_inr": best_tax,
-        "set_aside_percent_of_each_payment": round(100 * best_tax / projected, 1) if projected else 0,
-        "advance_tax_deadline": (f"Pay full advance tax by 15 March {fy_end.year} (presumptive scheme)"
+        "tds_credit_inr": tds_inr,
+        "tax_after_tds_inr": after_tds,
+        "refund_due_inr": max(0, tds_inr - best_tax),
+        "set_aside_percent_of_each_payment": round(100 * after_tds / projected, 1) if projected else 0,
+        "advance_tax_deadline": ("No advance tax needed (tax after TDS is under Rs 10,000)" if after_tds < ADVANCE_TAX_MIN else
+                                 f"Pay full advance tax by 15 March {fy_end.year} (presumptive scheme)"
                                  if best == "presumptive" else
                                  "Quarterly: 15% by 15 Jun, 45% by 15 Sep, 75% by 15 Dec, 100% by 15 Mar"),
         "assumptions": [
@@ -97,6 +105,7 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None):
             "Regular method: receipts minus recorded platform fees / expenses you provide",
             "No other income (salary, interest, capital gains) and no surcharge (income above 50 lakh)",
             "Foreign currency converted at a single configured rate, not the rate on each receipt date",
+            "TDS credit = TDS shown in imported statements so far; check it against Form 26AS / AIS",
         ],
         "disclaimer": "Estimate only. Confirm with a CA before filing.",
     }

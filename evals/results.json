@@ -1,0 +1,712 @@
+[
+ {
+  "suite": "A",
+  "case": "tax on ₹400,000",
+  "passed": true,
+  "detail": "expected 0, got 0"
+ },
+ {
+  "suite": "A",
+  "case": "tax on ₹1,200,000",
+  "passed": true,
+  "detail": "expected 0, got 0"
+ },
+ {
+  "suite": "A",
+  "case": "tax on ₹1,210,000",
+  "passed": true,
+  "detail": "expected 10400, got 10400"
+ },
+ {
+  "suite": "A",
+  "case": "tax on ₹1,600,000",
+  "passed": true,
+  "detail": "expected 124800, got 124800"
+ },
+ {
+  "suite": "A",
+  "case": "tax on ₹2,500,000",
+  "passed": true,
+  "detail": "expected 343200, got 343200"
+ },
+ {
+  "suite": "A",
+  "case": "projection scales 8 months to 12",
+  "passed": true,
+  "detail": "1650000"
+ },
+ {
+  "suite": "A",
+  "case": "presumptive 50% → ₹0 tax on ₹16.5L",
+  "passed": true,
+  "detail": "{'freelancer_type': 'profession', 'presumptive_rate': 0.5, 'financial_year': '2026-27', 'receipts_so_far_inr': 1100000, 'projected_annual_receipts_inr': 1650000, 'presumptive_eligible': True, 'tax_if_presumptive_inr': 0, 'tax_if_regular_inr': 97500, 'recommended': 'presumptive', 'estimated_annual_ta"
+ },
+ {
+  "suite": "A",
+  "case": "regular method tax on ₹16.5L − expenses",
+  "passed": true,
+  "detail": "97500"
+ },
+ {
+  "suite": "A",
+  "case": "recommends presumptive",
+  "passed": true,
+  "detail": "presumptive"
+ },
+ {
+  "suite": "A",
+  "case": "zero tax → no advance tax needed",
+  "passed": true,
+  "detail": "No advance tax needed (tax after TDS is under Rs 10,000)"
+ },
+ {
+  "suite": "A",
+  "case": "presumptive deadline is 15 March",
+  "passed": true,
+  "detail": "Pay full advance tax by 15 March 2027 (presumptive scheme)"
+ },
+ {
+  "suite": "A",
+  "case": "TDS credit reduces tax still to pay",
+  "passed": true,
+  "detail": "{'freelancer_type': 'profession', 'presumptive_rate': 0.5, 'financial_year': '2026-27', 'receipts_so_far_inr': 2400000, 'projected_annual_receipts_inr': 3600000, 'presumptive_eligible': True, 'tax_if_presumptive_inr': 166400, 'tax_if_regular_inr': 686400, 'recommended': 'presumptive', 'estimated_ann"
+ },
+ {
+  "suite": "A",
+  "case": "TDS above tax → refund due",
+  "passed": true,
+  "detail": "{'freelancer_type': 'profession', 'presumptive_rate': 0.5, 'financial_year': '2026-27', 'receipts_so_far_inr': 1000000, 'projected_annual_receipts_inr': 1500000, 'presumptive_eligible': True, 'tax_if_presumptive_inr': 0, 'tax_if_regular_inr': 109200, 'recommended': 'presumptive', 'estimated_annual_t"
+ },
+ {
+  "suite": "A",
+  "case": "business scheme uses 6%",
+  "passed": true,
+  "detail": "{'freelancer_type': 'business', 'presumptive_rate': 0.06, 'financial_year': '2026-27', 'receipts_so_far_inr': 1100000, 'projected_annual_receipts_inr': 1650000, 'presumptive_eligible': True, 'tax_if_presumptive_inr': 0, 'tax_if_regular_inr': 135200, 'recommended': 'presumptive', 'estimated_annual_ta"
+ },
+ {
+  "suite": "A",
+  "case": "above ₹75L: presumptive not eligible",
+  "passed": true,
+  "detail": "{'freelancer_type': 'profession', 'presumptive_rate': 0.5, 'financial_year': '2026-27', 'receipts_so_far_inr': 6000000, 'projected_annual_receipts_inr': 9000000, 'presumptive_eligible': False, 'tax_if_presumptive_inr': None, 'tax_if_regular_inr': 2371200, 'recommended': 'regular', 'estimated_annual_"
+ },
+ {
+  "suite": "A",
+  "case": "assumptions are reported",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "strips verb from client name",
+  "passed": true,
+  "detail": "{'client_name': 'Kestrel Health', 'client_email': 'k@health.io', 'description': 'app', 'amount': 1500.0, 'currency': 'USD', 'due_in_days': 15, 'note': 'Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST.'}"
+ },
+ {
+  "suite": "B",
+  "case": "adds RBI purpose code + LUT line",
+  "passed": true,
+  "detail": "Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST."
+ },
+ {
+  "suite": "B",
+  "case": "blocks invalid email",
+  "passed": true,
+  "detail": "[\"client_email 'not-an-email' is not a valid email - ask the user\"]"
+ },
+ {
+  "suite": "B",
+  "case": "blocks zero amount",
+  "passed": true,
+  "detail": "['amount must be between 0 and 25,000']"
+ },
+ {
+  "suite": "B",
+  "case": "blocks huge amount",
+  "passed": true,
+  "detail": "['amount must be between 0 and 25,000']"
+ },
+ {
+  "suite": "B",
+  "case": "blocks unsupported currency",
+  "passed": true,
+  "detail": "[\"currency must be one of ['AUD', 'CAD', 'EUR', 'GBP', 'USD']\"]"
+ },
+ {
+  "suite": "B",
+  "case": "blocks empty description",
+  "passed": true,
+  "detail": "['description of the work is missing']"
+ },
+ {
+  "suite": "B",
+  "case": "blocks reminder for PAID invoice",
+  "passed": true,
+  "detail": "[\"invoice INV2-PAID-0001 is PAID; don't chase a client who doesn't owe money\"]"
+ },
+ {
+  "suite": "B",
+  "case": "blocks reminder for unknown invoice",
+  "passed": true,
+  "detail": "['invoice INV2-FAKE-9999 does not exist - use an ID from the tools']"
+ },
+ {
+  "suite": "B",
+  "case": "allows reminder for open invoice",
+  "passed": true,
+  "detail": "[]"
+ },
+ {
+  "suite": "B",
+  "case": "write tool without approval is BLOCKED",
+  "passed": true,
+  "detail": "{'error': 'BLOCKED: this action needs a valid human approval for these exact details.'}"
+ },
+ {
+  "suite": "B",
+  "case": "approval for different amount is BLOCKED",
+  "passed": true,
+  "detail": "{'error': 'BLOCKED: this action needs a valid human approval for these exact details.'}"
+ },
+ {
+  "suite": "B",
+  "case": "valid approval executes",
+  "passed": true,
+  "detail": "{'invoice_id': 'INV2-EVAL-8217', 'pay_link': 'https://example.test/pay'}"
+ },
+ {
+  "suite": "B",
+  "case": "approval cannot be replayed",
+  "passed": true,
+  "detail": "{'error': 'BLOCKED: this action needs a valid human approval for these exact details.'}"
+ },
+ {
+  "suite": "B",
+  "case": "rejection cannot be used as approval",
+  "passed": true,
+  "detail": "{'error': 'BLOCKED: this action needs a valid human approval for these exact details.'}"
+ },
+ {
+  "suite": "B",
+  "case": "webhook events are idempotent",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "dedup: PayPal payout in bank is caught",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "dedup: unrelated client payment is kept",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "dedup: credit before the payment isn't matched",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "dedup: Indian client's UPI never mistaken for a payout",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "uncertain credit not counted until reviewed",
+  "passed": true,
+  "detail": "{'foreign': 112860, 'domestic': 90000.0}"
+ },
+ {
+  "suite": "B",
+  "case": "TDS from Indian clients becomes a tax credit",
+  "passed": true,
+  "detail": "9000"
+ },
+ {
+  "suite": "B",
+  "case": "'Not income' keeps it out",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "'Count as income' adds it",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "B",
+  "case": "INR invoices blocked (PayPal has no domestic INR)",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Do I need GST registration if all my clients are abroad?",
+  "passed": true,
+  "detail": "['Do I need GST registration?', 'GST for Indian clients', 'Indian clients']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Is GST charged on invoices to foreign clients?",
+  "passed": true,
+  "detail": "['Is GST charged on foreign clients?', 'GST for Indian clients', \"Why PayPal can't collect from Indian clients\"]",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: How do I export services without paying IGST?",
+  "passed": true,
+  "detail": "['LUT: exporting without paying IGST', 'Conditions for a service to count as an export', 'Is GST charged on foreign clients?']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: When is advance tax due under the presumptive scheme?",
+  "passed": true,
+  "detail": "['Due dates if you use the presumptive scheme', 'Due dates for everyone else', 'Do I have to pay advance tax?']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Do I have to pay advance tax at all?",
+  "passed": true,
+  "detail": "['Do I have to pay advance tax?', 'How to pay', 'Due dates if you use the presumptive scheme']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: What is the receipts limit for 44ADA?",
+  "passed": true,
+  "detail": "['What changed in 2026', 'Receipts limit for professions', 'Freelancers whose work is a business, not a specified profession']",
+  "top1": false
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Is content writing a specified profession?",
+  "passed": true,
+  "detail": "['Freelancers whose work is a business, not a specified profession', 'Specified professions: 50% of gross receipts', 'Receipts limit for professions']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Which professions get 50% presumptive?",
+  "passed": true,
+  "detail": "['Freelancers whose work is a business, not a specified profession', 'Specified professions: 50% of gross receipts', 'Receipts limit for professions']",
+  "top1": false
+ },
+ {
+  "suite": "C",
+  "case": "top-3: What are the new regime tax slabs?",
+  "passed": true,
+  "detail": "['New regime slabs (default regime)', 'Old regime', 'Why this matters for freelancers']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Is income up to 12 lakh tax free?",
+  "passed": true,
+  "detail": "['Rebate: zero tax up to Rs 12 lakh', 'New regime slabs (default regime)', 'Why this matters for freelancers']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Can freelancers claim the 75,000 standard deduction?",
+  "passed": true,
+  "detail": "['Standard deduction', 'Receipts limit for professions', 'Due dates for everyone else']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Which purpose code for web development?",
+  "passed": true,
+  "detail": "['Purpose codes', 'Fees to watch', 'PayPal in India']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: What is a FIRC?",
+  "passed": true,
+  "detail": "['FIRC and FIRA', 'PayPal in India', 'Fees to watch']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Which ITR form should a freelancer file?",
+  "passed": true,
+  "detail": "['Which return', 'Returns', 'LUT: exporting without paying IGST']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: What records should I keep?",
+  "passed": true,
+  "detail": "['Records to keep', 'FIRC and FIRA', 'Fees to watch']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Do Indian clients deduct TDS on my professional fees?",
+  "passed": true,
+  "detail": "['TDS deducted by Indian business clients', \"Why PayPal can't collect from Indian clients\", 'GST for Indian clients']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: How do I treat TDS deducted by my client?",
+  "passed": true,
+  "detail": "['TDS deducted by Indian business clients', 'TDS is your tax already paid', 'Fees to watch']",
+  "top1": false
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Do I charge GST to Indian clients?",
+  "passed": true,
+  "detail": "['Indian clients', 'GST for Indian clients', \"Why PayPal can't collect from Indian clients\"]",
+  "top1": false
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Can I send a PayPal invoice to a client in India?",
+  "passed": true,
+  "detail": "[\"Why PayPal can't collect from Indian clients\", 'PayPal in India', 'Is GST charged on foreign clients?']",
+  "top1": true
+ },
+ {
+  "suite": "C",
+  "case": "top-3: Do UPI payments from Indian clients count as income?",
+  "passed": true,
+  "detail": "['Do payments from Indian clients count?', \"Why PayPal can't collect from Indian clients\", 'TDS is your tax already paid']",
+  "top1": true
+ },
+ {
+  "suite": "D",
+  "case": "'Bill Acme $1200 for a landing page, ap@acme.com' → billing",
+  "passed": true,
+  "detail": "got billing"
+ },
+ {
+  "suite": "D",
+  "case": "'Create an invoice for Kestrel Health for €900' → billing",
+  "passed": true,
+  "detail": "got billing"
+ },
+ {
+  "suite": "D",
+  "case": "'Show me my invoices' → billing",
+  "passed": true,
+  "detail": "got billing"
+ },
+ {
+  "suite": "D",
+  "case": "'Who hasn't paid me yet?' → collections",
+  "passed": true,
+  "detail": "got collections"
+ },
+ {
+  "suite": "D",
+  "case": "'Chase Nordwind for the late payment' → collections",
+  "passed": true,
+  "detail": "got collections"
+ },
+ {
+  "suite": "D",
+  "case": "'Did any client pay me since yesterday?' → collections",
+  "passed": true,
+  "detail": "got collections"
+ },
+ {
+  "suite": "D",
+  "case": "'How much tax will I owe this year?' → tax",
+  "passed": true,
+  "detail": "got tax"
+ },
+ {
+  "suite": "D",
+  "case": "'Do I need GST registration?' → tax",
+  "passed": true,
+  "detail": "got tax"
+ },
+ {
+  "suite": "D",
+  "case": "'When is my advance tax due?' → tax",
+  "passed": true,
+  "detail": "got tax"
+ },
+ {
+  "suite": "D",
+  "case": "'Should I use 44ADA or the regular method?' → tax",
+  "passed": true,
+  "detail": "got tax"
+ },
+ {
+  "suite": "D",
+  "case": "'Why was the HDFC credit on 31 October not counted?' → statement",
+  "passed": true,
+  "detail": "got statement"
+ },
+ {
+  "suite": "D",
+  "case": "'What did you find in my Upwork statement?' → statement",
+  "passed": true,
+  "detail": "got statement"
+ },
+ {
+  "suite": "D",
+  "case": "'Which bank entries were duplicates?' → statement",
+  "passed": true,
+  "detail": "got statement"
+ },
+ {
+  "suite": "D",
+  "case": "'How much did I earn from Upwork this year?' → tax",
+  "passed": true,
+  "detail": "got statement"
+ },
+ {
+  "suite": "D",
+  "case": "'Bill Rahul Designs in Bangalore ₹38,000 for a logo pack' → billing",
+  "passed": true,
+  "detail": "got billing"
+ },
+ {
+  "suite": "D",
+  "case": "'Is the ₹5,000 UPI from Priya counted as income?' → statement",
+  "passed": true,
+  "detail": "got statement"
+ },
+ {
+  "suite": "D",
+  "case": "'How much TDS have my Indian clients deducted?' → tax",
+  "passed": true,
+  "detail": "got tax"
+ },
+ {
+  "suite": "E",
+  "case": "invoice request pauses for approval",
+  "passed": true,
+  "detail": "{'reply': '', 'pending': {'tool': 'create_and_send_invoice', 'args': {'amount': 600.0, 'client_email': 'lumen@studio.com', 'client_name': 'Lumen Studio', 'description': 'Logo design', 'note': 'Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST.', 'cur"
+ },
+ {
+  "suite": "E",
+  "case": "nothing sent before approval",
+  "passed": true,
+  "detail": "0"
+ },
+ {
+  "suite": "E",
+  "case": "correct amount + email",
+  "passed": true,
+  "detail": "{'amount': 600.0, 'client_email': 'lumen@studio.com', 'client_name': 'Lumen Studio', 'description': 'Logo design', 'note': 'Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST.', 'currency': 'USD', 'due_in_days': 15}"
+ },
+ {
+  "suite": "E",
+  "case": "clean client name",
+  "passed": true,
+  "detail": "Lumen Studio"
+ },
+ {
+  "suite": "E",
+  "case": "purpose code + LUT on invoice",
+  "passed": true,
+  "detail": "Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST."
+ },
+ {
+  "suite": "E",
+  "case": "edited approval sends once with edited amount",
+  "passed": true,
+  "detail": "('invoice', {'amount': 650.0, 'client_email': 'lumen@studio.com', 'client_name': 'Lumen Studio', 'description': 'Logo design', 'note': 'Purpose code: P0899. Export of services - supply meant for export under LUT without payment of IGST.', 'currency': 'USD', 'due_in_days': 15})"
+ },
+ {
+  "suite": "E",
+  "case": "picks up currency + due days",
+  "passed": true,
+  "detail": "{'amount': 900.0, 'client_email': 'kestrel@health.io', 'client_name': 'Kestrel Health', 'currency': 'EUR', 'description': 'App maintenance', 'due_in_days': 30, 'note': 'Purpose code: P0802. Export of services - supply meant for export under LUT without payment of IGST.'}"
+ },
+ {
+  "suite": "E",
+  "case": "rejected invoice is never sent",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "suite": "E",
+  "case": "missing email → asks instead of guessing",
+  "passed": true,
+  "detail": "Sure! I’ll need the client’s email address to create the PayPal invoice. Could you share that, please?"
+ },
+ {
+  "suite": "E",
+  "case": "reminder pauses for approval with the right invoice",
+  "passed": true,
+  "detail": "{'tool': 'send_reminder', 'args': {'invoice_id': 'INV2-OPEN-0002', 'note': 'Hi,\\n\\nThis is a courteous reminder that invoice INV2-OPEN-0002 for $525.00 was due on 29 Oct 2026 and is now 12 days overdue. Kindly arrange payment at your earliest convenience.\\n\\nThank you,\\n[Your Name]'}, 'agent': 'coll"
+ },
+ {
+  "suite": "E",
+  "case": "never chases a PAID invoice",
+  "passed": true,
+  "detail": "[{'agent': 'supervisor', 'event': '→ collections', 'why': 'User requests a payment reminder for a specific invoice, which falls under collections for reminders and overdue payments.'}, {'agent': 'collections', 'tool': 'find_invoices_needing_followup', 'event': 'used'}, {'agent': 'collections', 'tool"
+ },
+ {
+  "suite": "E",
+  "case": "never acts on an invented invoice ID",
+  "passed": true,
+  "detail": "[{'agent': 'supervisor', 'event': '→ collections', 'why': 'User requests to send a reminder for a specific invoice, which falls under collections tasks.'}, {'agent': 'collections', 'tool': 'list_invoices', 'event': 'used'}]"
+ },
+ {
+  "suite": "E",
+  "case": "tax answer uses the calculator",
+  "passed": true,
+  "detail": "[{'agent': 'supervisor', 'event': '→ tax', 'why': 'User asks about the amount of tax owed for the year, which is a tax‑related query.'}, {'agent': 'tax', 'tool': 'get_income_and_tax', 'event': 'used'}, {'agent': 'tax', 'tool': 'search_tax_rules', 'event': 'used'}]"
+ },
+ {
+  "suite": "E",
+  "case": "tax figure matches the calculator",
+  "passed": true,
+  "detail": "expected 0; reply: Your estimate shows **no tax payable** for FY 2026‑27.\n\n- The calculator projects ₹112860 received so far and using the **presumptive scheme (Section 58)** – 50 % of receipts are deemed income for spe"
+ },
+ {
+  "suite": "E",
+  "case": "Indian client: no PayPal invoice attempted",
+  "passed": true,
+  "detail": "[{'agent': 'supervisor', 'event': '→ billing', 'why': 'User is requesting to create and send a new invoice for a client, which falls under billing tasks.'}]"
+ },
+ {
+  "suite": "E",
+  "case": "Indian client: explains + offers UPI request",
+  "passed": true,
+  "detail": "paypal can’t be used for domestic indian invoices in inr.\n\n**draft invoice text you can send:**  \nclient: bill rahul designs pvt ltd  \nwork: logo pack  \namount: ₹38,000 (gst @ 18 % if you are gst‑regi"
+ },
+ {
+  "suite": "E",
+  "case": "autopilot checks payments + follow-ups",
+  "passed": true,
+  "detail": "['get_payment_updates', 'find_invoices_needing_followup']"
+ },
+ {
+  "suite": "E",
+  "case": "autopilot pauses before emailing a client",
+  "passed": true,
+  "detail": "{'tool': 'send_reminder', 'args': {'invoice_id': 'INV2-OPEN-0002', 'note': 'Hi,\\n\\nJust a friendly reminder that Invoice INV2-OPEN-0002 for USD 525.00 was due on 29 Oct 2026 and is now 12 days overdue. Could you please arrange payment this week?\\n\\nThank you,\\n[Your Name]'}, 'agent': 'collections', "
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: Do I need GST registration if all my clients are abroad?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: Do I need GST registration if all my clients are abroad?",
+  "passed": true,
+  "detail": "All factual statements (threshold for mandatory GST registration, inclusion of export income, optional registration below threshold, and zero‑rated treatment of exports under Section 16) are directly backed by the provided passages. The answer includes a Sources line citing the relevant passages."
+ },
+ {
+  "suite": "F",
+  "case": "cited: Do I need GST registration if all my clients are abroad?",
+  "passed": true,
+  "detail": "All factual statements (threshold for mandatory GST registration, inclusion of export income, optional registration below threshold, and zero‑rated treatment of exports under Section 16) are directly backed by the provided passages. The answer includes a Sources line citing the relevant passages."
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: When do I pay advance tax under the presumptive scheme?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: When do I pay advance tax under the presumptive scheme?",
+  "passed": true,
+  "detail": "The answer states that under the presumptive scheme the entire advance tax is payable by 15 March (15 March 2027 for FY 2026‑27) and that payments up to 31 March are treated as advance tax, which matches the first passage. It also includes a citation to that passage, so it is both supported and cite"
+ },
+ {
+  "suite": "F",
+  "case": "cited: When do I pay advance tax under the presumptive scheme?",
+  "passed": true,
+  "detail": "The answer states that under the presumptive scheme the entire advance tax is payable by 15 March (15 March 2027 for FY 2026‑27) and that payments up to 31 March are treated as advance tax, which matches the first passage. It also includes a citation to that passage, so it is both supported and cite"
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: Can I claim the ₹75,000 standard deduction as a freelancer?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: Can I claim the ₹75,000 standard deduction as a freelancer?",
+  "passed": true,
+  "detail": "The answer correctly claims that the Rs 75,000 standard deduction is limited to salary income and does not apply to freelance/business income, which is directly supported by the first passage. It also includes a citation to that passage, and it does not abstain from answering."
+ },
+ {
+  "suite": "F",
+  "case": "cited: Can I claim the ₹75,000 standard deduction as a freelancer?",
+  "passed": true,
+  "detail": "The answer correctly claims that the Rs 75,000 standard deduction is limited to salary income and does not apply to freelance/business income, which is directly supported by the first passage. It also includes a citation to that passage, and it does not abstain from answering."
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: Which RBI purpose code should I use for web development work?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: Which RBI purpose code should I use for web development work?",
+  "passed": true,
+  "detail": "The answer correctly states P0802 for web development, which is directly supported by the first passage. It includes a citation to the relevant passage, and it does not abstain from answering."
+ },
+ {
+  "suite": "F",
+  "case": "cited: Which RBI purpose code should I use for web development work?",
+  "passed": true,
+  "detail": "The answer correctly states P0802 for web development, which is directly supported by the first passage. It includes a citation to the relevant passage, and it does not abstain from answering."
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: Can a content writer use the 50% presumptive scheme?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: Can a content writer use the 50% presumptive scheme?",
+  "passed": true,
+  "detail": "All factual statements (50% rate limited to specified professions, content writing treated as business, business presumptive rates) are directly backed by passage 2. The answer includes explicit passage citations, so it is both supported and cited, and it does not abstain."
+ },
+ {
+  "suite": "F",
+  "case": "cited: Can a content writer use the 50% presumptive scheme?",
+  "passed": true,
+  "detail": "All factual statements (50% rate limited to specified professions, content writing treated as business, business presumptive rates) are directly backed by passage 2. The answer includes explicit passage citations, so it is both supported and cited, and it does not abstain."
+ },
+ {
+  "suite": "F",
+  "case": "retrieves rules: My Indian client deducted 10% TDS. How should I count that payment?",
+  "passed": true,
+  "detail": "['search_tax_rules']"
+ },
+ {
+  "suite": "F",
+  "case": "grounded: My Indian client deducted 10% TDS. How should I count that payment?",
+  "passed": true,
+  "detail": "The answer's statements about recording the gross fee, treating TDS as a tax credit, and claiming it on the return are directly supported by the provided passages, and the answer includes a citation to the relevant passage."
+ },
+ {
+  "suite": "F",
+  "case": "cited: My Indian client deducted 10% TDS. How should I count that payment?",
+  "passed": true,
+  "detail": "The answer's statements about recording the gross fee, treating TDS as a tax credit, and claiming it on the return are directly supported by the provided passages, and the answer includes a citation to the relevant passage."
+ },
+ {
+  "suite": "F",
+  "case": "abstains: How are my crypto trading gains taxed in India?",
+  "passed": true,
+  "detail": "The answer correctly states that the knowledge base lacks information on crypto trading gains taxation in India, which is consistent with the provided passages that do not cover crypto. It does not cite any passage, and it abstains from providing a tax answer, recommending a chartered accountant ins"
+ }
+]

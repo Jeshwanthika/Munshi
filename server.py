@@ -6,10 +6,11 @@ import uuid
 import json
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+import auth
 import db
 import graph
 import ledger
@@ -18,6 +19,64 @@ import rag
 
 app = FastAPI(title="Munshi")
 HERE = os.path.dirname(os.path.abspath(__file__))
+OPEN_PATHS = {"/login", "/api/login", "/api/paypal/webhook", "/favicon.ico"}  # webhook is signature-verified instead
+
+
+@app.middleware("http")
+async def require_login(request: Request, call_next):
+    """Every page and API needs a valid session, except the login page and PayPal's webhook."""
+    path = request.url.path
+    if path in OPEN_PATHS:
+        return await call_next(request)
+    user = auth.read_session(request.cookies.get(auth.COOKIE))
+    if not user:
+        if path.startswith("/api/") or path.startswith("/samples/"):
+            return JSONResponse({"detail": "login required"}, status_code=401)
+        return RedirectResponse("/login")
+    # CSRF defence: state-changing requests must come from this site
+    origin = request.headers.get("origin")
+    if request.method in ("POST", "PUT", "PATCH", "DELETE") and origin:
+        if origin.split("://", 1)[-1] != request.headers.get("host"):
+            return JSONResponse({"detail": "cross-site request blocked"}, status_code=403)
+    request.state.user = user
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store"  # after sign-out, Back can't show cached private pages
+    return response
+
+
+class LoginIn(BaseModel):
+    username: str
+    password: str
+
+
+@app.get("/login")
+def login_page(request: Request):
+    if auth.read_session(request.cookies.get(auth.COOKIE)):   # already signed in
+        return RedirectResponse("/")
+    return FileResponse(os.path.join(HERE, "static", "login.html"), headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/login")
+def login(body: LoginIn, request: Request):
+    ok, msg = auth.check_login(request.client.host if request.client else "?", body.username, body.password)
+    if not ok:
+        return JSONResponse({"detail": msg}, status_code=401)
+    resp = JSONResponse({"ok": True})
+    resp.set_cookie(auth.COOKIE, auth.make_session(body.username.strip()), max_age=auth.SESSION_SECONDS,
+                    httponly=True, samesite="lax", secure=request.url.scheme == "https")
+    return resp
+
+
+@app.post("/api/logout")
+def logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie(auth.COOKIE, path="/", httponly=True, samesite="lax")
+    return resp
+
+
+@app.get("/api/me")
+def me(request: Request):
+    return {"user": request.state.user}
 
 
 class ChatIn(BaseModel):
@@ -123,6 +182,18 @@ def rules(q: str):
 def audit():
     """Every human decision on a money/client-touching action: what, when, approved or not, result."""
     return db.audit_log()
+
+
+class ReviewIn(BaseModel):
+    include: bool
+
+
+@app.post("/api/entries/{entry_id}/review")
+def review(entry_id: int, body: ReviewIn):
+    """The human decides whether an uncertain credit is income. The AI never decides this alone."""
+    if not db.review_entry(entry_id, body.include):
+        raise HTTPException(404, "entry not found")
+    return {"ok": True}
 
 
 @app.post("/api/reset-imports")

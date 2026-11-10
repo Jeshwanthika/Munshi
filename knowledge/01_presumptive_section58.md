@@ -12,6 +12,7 @@ You can always declare a higher profit than 50%. Declaring a lower one generally
 The scheme applies if gross receipts are up to Rs 50 lakh, raised to Rs 75 lakh when cash receipts are no more than 5% of total receipts. PayPal, Upwork and bank transfers are not cash, so a freelancer paid this way normally qualifies for the Rs 75 lakh limit.
 
 ## Freelancers whose work is a business, not a specified profession
+The 50% presumptive rate is available only to specified professions. Freelancers whose work is not a specified profession cannot use the 50% rate; they can instead use the business presumptive scheme described here.
 Some freelance work (for example content writing, translation, social-media management, or selling digital products) may be treated as a business rather than a specified profession. The business presumptive scheme deems profit at 6% of receipts received digitally (8% for cash), with a turnover limit of Rs 2 crore, or Rs 3 crore if cash receipts are 5% or less. Under Section 58, a person carrying on a specified profession cannot use the business scheme. Classification can be grey, so confirm it with a CA.
 
 ## Who can use it

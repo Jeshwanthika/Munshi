@@ -38,16 +38,34 @@ def _get_token():
     return _token["value"]
 
 
+RETRYABLE = {429, 500, 502, 503, 504}
+
+
 def _call(method, path, **kwargs):
-    headers = {
-        "Authorization": f"Bearer {_get_token()}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-    }
-    r = requests.request(method, f"{BASE}{path}", headers=headers, timeout=30, **kwargs)
-    if r.status_code >= 400:
-        raise PayPalError(f"PayPal {method} {path} failed ({r.status_code}): {r.text}")
-    return r.json() if r.text else {}
+    """Reads (GET) are retried on PayPal hiccups (5xx/429/network) with backoff 1s, 2s, 4s.
+    Writes are NOT retried automatically, so a flaky network can never create a duplicate invoice."""
+    attempts = 4 if method == "GET" else 1
+    for i in range(attempts):
+        headers = {
+            "Authorization": f"Bearer {_get_token()}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation",
+        }
+        try:
+            r = requests.request(method, f"{BASE}{path}", headers=headers, timeout=30, **kwargs)
+        except requests.RequestException as e:
+            if i < attempts - 1:
+                time.sleep(2 ** i)
+                continue
+            raise PayPalError(f"PayPal is not reachable right now ({e.__class__.__name__}). Please try again.")
+        if r.status_code in RETRYABLE and i < attempts - 1:
+            time.sleep(2 ** i)
+            continue
+        if r.status_code in RETRYABLE:
+            raise PayPalError(f"PayPal sandbox is temporarily unavailable ({r.status_code}). Please try again shortly.")
+        if r.status_code >= 400:
+            raise PayPalError(f"PayPal {method} {path} failed ({r.status_code}): {r.text[:300]}")
+        return r.json() if r.text else {}
 
 
 def payer_link(invoice_id):
@@ -88,8 +106,19 @@ def create_and_send_invoice(client_name, client_email, description, amount,
             "due_date": due, "client": client_name, "pay_link": payer_link(inv_id)}
 
 
+SYNC = {"ok": None, "at": None, "error": None}   # status of the last PayPal sync, shown on the dashboard
+_CACHE = {"invoices": None}
+
+
 def list_invoices(page_size=50):
-    data = _call("GET", f"/v2/invoicing/invoices?page_size={page_size}&total_required=true")
+    """Live invoices from PayPal. If PayPal is down, fall back to the last successful sync (flagged as stale)."""
+    try:
+        data = _call("GET", f"/v2/invoicing/invoices?page_size={page_size}&total_required=true")
+    except PayPalError as e:
+        SYNC.update(ok=False, error=str(e))
+        if _CACHE["invoices"] is not None:
+            return [dict(i) for i in _CACHE["invoices"]]
+        raise
     out = []
     for inv in data.get("items", []):
         rec = (inv.get("primary_recipients") or [{}])[0].get("billing_info", {})
@@ -106,6 +135,8 @@ def list_invoices(page_size=50):
             "invoice_date": detail.get("invoice_date"),
             "due_date": (detail.get("payment_term") or {}).get("due_date"),
         })
+    _CACHE["invoices"] = out
+    SYNC.update(ok=True, at=time.strftime("%H:%M:%S"), error=None)
     return out
 
 

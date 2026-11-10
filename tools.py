@@ -115,13 +115,18 @@ def get_income_and_tax(extra_expenses_inr=0):
             "overdue_invoices": [{k: i[k] for k in ("invoice_id", "client", "amount", "currency", "due_date")}
                                  for i in s["overdue"]],
             "duplicates_ignored": len([e for e in s["entries"] if e["duplicate_of"]]),
+            "received_inr_by_client_type": s["by_client_type"],
+            "tds_credit_inr": s["tds_credit_inr"],
+            "credits_waiting_for_user_review": [{k: e[k] for k in ("date", "payer", "amount_inr")} for e in s["needs_review"]],
+            "gst": s["gst"],
             "tax": s["tax"]}
 
 
 def list_imported_entries():
     rows = db.all_entries()
-    return [{k: r[k] for k in ("date", "source", "payer", "description", "amount", "currency",
-                                "amount_inr", "entry_type", "duplicate_of")} for r in rows] \
+    return [{k: r.get(k) for k in ("date", "source", "payer", "description", "amount", "currency", "amount_inr",
+                                    "entry_type", "duplicate_of", "client_type", "needs_review", "included", "tds_inr")}
+            for r in rows] \
         or {"message": "Nothing imported yet."}
 
 
@@ -133,7 +138,7 @@ IMPL = {
     "get_payment_updates": lambda **a: get_payment_updates(),
     "get_income_and_tax": lambda **a: get_income_and_tax(**a),
     "list_imported_entries": lambda **a: list_imported_entries(),
-    "search_tax_rules": lambda **a: rag.search_tax_rules(a.get("query", "")),
+    "search_tax_rules": lambda **a: rag.search_tax_rules(a.get("query", ""), k=4),
 }
 
 
