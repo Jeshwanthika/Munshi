@@ -67,6 +67,8 @@ def _mock_remind(**a):
     return {"invoice_id": a.get("invoice_id"), "reminder_sent": True}
 
 
+for _i in MOCK_INVOICES:  # unpaid invoices carry a pay link, like the real list_invoices
+    _i["pay_link"] = f"https://www.sandbox.paypal.com/invoice/p/#{_i['invoice_id']}" if _i["status"] == "SENT" else None
 pp.list_invoices = lambda page_size=50: [dict(i) for i in MOCK_INVOICES]
 pp.create_and_send_invoice = _mock_create
 pp.send_reminder = _mock_remind
@@ -372,6 +374,12 @@ def suite_e():
         jargon = [w for w in ("marginal relief", "cess", "slab") if w in reply]
         check("E", "default tax answer is plain (no jargon)", not jargon, jargon)
     pace(); safe("E", "plain tax", e12)
+
+    def e13():
+        tid, r, sent = _run("Can you give me the payment link for Harbor Coffee's invoice?")
+        check("E", "gives the client's pay link (no approval needed)",
+              not r["pending"] and sent == 0 and "INV2-OPEN-0003" in (r["reply"] or ""), (r["reply"] or "")[:200])
+    pace(); safe("E", "pay link", e13)
 
     def e10():
         tid, r, sent = _run("Show me step by step how my income tax is worked out.")

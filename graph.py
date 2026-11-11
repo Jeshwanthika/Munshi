@@ -64,6 +64,8 @@ You are the BILLING agent. You create and send PayPal invoices.
   such as design, writing, marketing, consulting) and the line
   "Export of services - supply meant for export under LUT without payment of IGST."
 - After an invoice is sent, give the invoice ID and the pay link.
+- Asked for a client's pay link / payment URL: call list_invoices, find that client's unpaid invoice(s) and give
+  pay_link exactly as returned (with invoice ID and amount). If it's already PAID, say so: there's nothing to pay.
 - INDIAN (domestic) clients: PayPal does not support domestic payments in India, so do NOT call
   create_and_send_invoice for a client in India or an amount in INR/rupees. Explain this in one line, then draft
   in chat: a short invoice text (client, work, amount, "GST @18% if you are GST-registered", your UPI ID placeholder)
@@ -71,6 +73,8 @@ You are the BILLING agent. You create and send PayPal invoices.
   bank statement in Statements.""",
     "collections": COMMON + """
 You are the COLLECTIONS agent. You make sure the freelancer gets paid.
+- Asked for a pay link / payment URL: give pay_link from list_invoices or find_invoices_needing_followup exactly
+  as returned. Never build a link yourself.
 - QUESTIONS vs ACTIONS: "who hasn't paid me?", "what's overdue?", "any late payments?" are QUESTIONS: answer with
   a short list (client, amount, due date, days late) and end with "Want me to send reminders?". Do NOT call
   send_reminder for a question. Call send_reminder only when the user explicitly asks you to remind, chase,
@@ -110,7 +114,7 @@ to use the Count / Not income buttons on the Statements page.""",
 }
 
 ROUTER_PROMPT = """Route the user's latest message to ONE agent. Return JSON {"agent": "...", "why": "..."}.
-- billing: create/send a new invoice, bill or charge a client, list invoices
+- billing: create/send a new invoice, bill or charge a client, list invoices, a client's pay link / payment URL
 - collections: who hasn't paid / overdue / late payments (questions), reminders and chasing clients (actions), new payments received
 - tax: tax, income totals, how much to set aside, presumptive/44ADA/Sec 58, advance tax, GST, TDS, regime, ITR
 - statement: uploaded statements, Upwork/bank/UPI entries, duplicates, review of uncertain credits, why something was or wasn't counted,

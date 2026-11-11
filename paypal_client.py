@@ -134,6 +134,9 @@ def list_invoices(page_size=50):
             "amount": amt.get("value"),
             "invoice_date": detail.get("invoice_date"),
             "due_date": (detail.get("payment_term") or {}).get("due_date"),
+            # where the client pays: PayPal's own recipient link if given, else the standard invoice link
+            "pay_link": ((detail.get("metadata") or {}).get("recipient_view_url") or payer_link(inv.get("id")))
+                        if inv.get("status") in ("SENT", "UNPAID", "PARTIALLY_PAID", "SCHEDULED") else None,
         })
     _CACHE["invoices"] = out
     SYNC.update(ok=True, at=time.strftime("%H:%M:%S"), error=None)

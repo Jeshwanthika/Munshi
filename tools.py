@@ -31,7 +31,7 @@ SPECS = {
             "note": {**_nullable("string"), "description": "Invoice note incl. RBI purpose code and LUT line"},
         }, "required": ["client_name", "client_email", "description", "amount"]}},
     "list_invoices": {
-        "description": "List all PayPal invoices with status (SENT, UNPAID, PAID, ...), amounts and due dates.",
+        "description": "List all PayPal invoices with status (SENT, UNPAID, PAID, ...), amounts, due dates and, for unpaid ones, the client's pay_link.",
         "parameters": {"type": "object", "properties": {}}},
     "send_reminder": {
         "description": "Send a payment reminder email for an unpaid PayPal invoice. Requires human approval.",

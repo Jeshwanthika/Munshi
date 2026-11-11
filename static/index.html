@@ -402,7 +402,7 @@ function render(s){
     return `<tr class="${od.has(i.invoice_id)?'overdue':''}"><td>${esc(i.client)}<br><small class="muted">${esc(i.invoice_id)}</small></td>
       <td class="num">${esc(i.currency)} ${Number(i.amount).toLocaleString('en-IN')}</td><td class="num">${inr(i.amount_inr)}</td>
       <td>${esc(i.invoice_date||'—')}</td><td>${esc(i.due_date||'—')}</td><td><span class="status s-${st}">${st.replace(/_/g,' ')}</span></td>
-      <td>${['SENT','UNPAID'].includes(i.status)?`<button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button>`:''}</td></tr>`;
+      <td style="white-space:nowrap">${i.pay_link?`<button onclick="copyLink(this,'${esc(i.pay_link)}')" title="${esc(i.pay_link)}">Copy pay link</button> `:''}${['SENT','UNPAID'].includes(i.status)?`<button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button>`:''}</td></tr>`;
   }).join('') : '<tr><td colspan="7" class="empty">No invoices yet. Click "+ New invoice".</td></tr>';
 
   $('followups').innerHTML = follow.length ? follow.map(i=>`<tr class="${i.d<0?'overdue':''}"><td>${esc(i.client)}</td>
@@ -445,6 +445,12 @@ function render(s){
 async function reviewEntry(id, include){
   await fetch(`/api/entries/${id}/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({include})});
   load();
+}
+
+async function copyLink(btn, url){
+  try{ await navigator.clipboard.writeText(url); btn.textContent='Copied ✓'; }
+  catch(e){ prompt('Copy the pay link:', url); }
+  setTimeout(()=>btn.textContent='Copy pay link', 1500);
 }
 
 async function loadAudit(){
