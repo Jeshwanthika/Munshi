@@ -4,7 +4,7 @@
 
 Built for the **PayPal "Build What's Next with PayPal and AI" hackathon** · Python · LangGraph · Groq · PayPal REST APIs · MCP
 
-🔗 **Live demo:** `<RENDER_URL>` · **Demo login:** see the Devpost testing instructions · 🎥 **Video:** `<YOUTUBE_URL>`
+🔗 **Live demo:** `https://munshi-fm88.onrender.com` · **Demo login:** see the Devpost testing instructions · 🎥 **Video:** `<YOUTUBE_URL>`
 
 ---
 
