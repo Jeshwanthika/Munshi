@@ -63,7 +63,7 @@ SPECS = {
 AGENT_TOOLS = {
     "billing": ["create_and_send_invoice", "list_invoices"],
     "collections": ["find_invoices_needing_followup", "send_reminder", "get_payment_updates", "list_invoices"],
-    "tax": ["get_income_and_tax", "search_tax_rules"],
+    "tax": ["get_income_and_tax", "search_tax_rules", "list_imported_entries"],
     "statement": ["list_imported_entries", "get_income_and_tax"],
 }
 

@@ -32,6 +32,45 @@ def slab_tax(taxable):
     return min(tax, taxable - REBATE_LIMIT)
 
 
+def inr(x):
+    """Indian digit grouping: 2497696 -> ₹24,97,696"""
+    n = str(round(abs(x)))
+    head, tail = n[:-3], n[-3:]
+    while len(head) > 2:
+        tail = head[-2:] + "," + tail
+        head = head[:-2]
+    return ("-" if x < 0 else "") + "₹" + (head + "," + tail if head else tail)
+
+
+def _lakh(x):
+    return f"{x / 100000:g}L"
+
+
+def breakdown(taxable):
+    """Step-by-step working for one taxable income: slab by slab, rebate / marginal relief, cess."""
+    lines, lower = [], 0
+    for upper, rate in SLABS:
+        if taxable > lower:
+            part = min(taxable, upper) - lower
+            label = (f"Up to ₹{_lakh(upper)}" if lower == 0 else
+                     f"Above ₹{_lakh(lower)}" if upper == float("inf") else f"₹{_lakh(lower)}–{_lakh(upper)}")
+            lines.append({"slab": label,
+                          "rate": rate, "income_in_slab": round(part), "tax": round(part * rate)})
+        lower = upper
+    raw = sum(l["tax"] for l in lines)
+    after = slab_tax(taxable)
+    if taxable <= REBATE_LIMIT:
+        relief = f"Rebate: taxable income is within ₹12L, so tax is reduced to ₹0"
+    elif after < raw:
+        relief = (f"Marginal relief: income is only {inr(taxable - REBATE_LIMIT)} above ₹12L, "
+                  f"so tax is capped at that amount")
+    else:
+        relief = None
+    return {"taxable_income": round(taxable), "slabs": lines, "slab_tax": round(raw),
+            "relief": relief, "tax_after_relief": round(after),
+            "cess": round(after * CESS), "total": total_tax(taxable)}
+
+
 def total_tax(taxable):
     base = slab_tax(taxable)
     return round(base * (1 + CESS))
@@ -88,14 +127,23 @@ def estimate(gross_receipts_inr, expenses_inr=0.0, today=None, kind=None, tds_in
         "tax_if_regular_inr": tax_regular,
         "recommended": best,
         "estimated_annual_tax_inr": best_tax,
+        "calculation": {
+            "months_counted": months_elapsed,
+            "projection": f"{inr(gross_receipts_inr)} × 12 ÷ {months_elapsed} = {inr(projected)}",
+            "presumptive": ({"deemed_income": f"{rate:.0%} of {inr(projected)} = {inr(presumptive_income)}",
+                             **breakdown(presumptive_income)} if eligible else None),
+            "regular": {"deemed_income": (f"{inr(projected)} − projected expenses "
+                                          f"{inr(projected - regular_income)} = {inr(regular_income)}"),
+                        **breakdown(regular_income)},
+        },
         "tds_credit_inr": tds_inr,
         "tax_after_tds_inr": after_tds,
         "refund_due_inr": max(0, tds_inr - best_tax),
         "set_aside_percent_of_each_payment": round(100 * after_tds / projected, 1) if projected else 0,
-        "advance_tax_deadline": ("No advance tax needed (tax after TDS is under Rs 10,000)" if after_tds < ADVANCE_TAX_MIN else
-                                 f"Pay full advance tax by 15 March {fy_end.year} (presumptive scheme)"
+        "advance_tax_deadline": ("No advance tax needed: less than ₹10,000 left to pay after TDS" if after_tds < ADVANCE_TAX_MIN else
+                                 f"Pay it in one go by 15 March {fy_end.year} (advance tax)"
                                  if best == "presumptive" else
-                                 "Quarterly: 15% by 15 Jun, 45% by 15 Sep, 75% by 15 Dec, 100% by 15 Mar"),
+                                 "Pay in 4 parts: 15% by 15 Jun, 45% by 15 Sep, 75% by 15 Dec, 100% by 15 Mar"),
         "assumptions": [
             "Resident individual, under 60, new tax regime (default) for Tax Year 2026-27",
             "Projection = receipts so far scaled to 12 months of the financial year",

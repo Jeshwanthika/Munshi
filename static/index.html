@@ -62,6 +62,8 @@
   .hero .compare b{color:var(--gold)}
   .hero .side{border-left:1px solid rgba(255,255,255,.18);padding-left:20px;font-size:13.5px}
   .hero .side div{margin:5px 0}
+  .hrow{display:flex;justify-content:space-between;gap:16px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13.5px}
+  .hrow:last-child{border-bottom:none} .hrow span{color:#A9CDB8} .hrow b{color:#fff;text-align:right}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
   .kpi .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -109,6 +111,15 @@
   .warn{background:var(--amber-soft);color:var(--amber);padding:9px 14px;border-radius:8px;display:none}
   ul.assume{margin:0;padding-left:18px;color:var(--ink)} ul.assume li{margin:4px 0}
   .compare-tbl td.v{text-align:right}
+  .plainbig{font:700 34px "Fraunces",serif;color:var(--brand-dark);margin:2px 0 10px}
+  .plainbig small{font:400 14px "IBM Plex Sans";color:var(--muted);margin-left:6px}
+  ul.plain{list-style:none;padding:0;margin:0} ul.plain li{display:flex;gap:10px;margin:9px 0;font-size:14px}
+  ul.plain li span:first-child{width:22px;flex-shrink:0;text-align:center}
+  .tabsw{display:inline-flex;gap:4px} .tabsw button,.mini{font:600 12px "IBM Plex Sans";padding:3px 10px;border-radius:99px;background:var(--bg);white-space:nowrap}
+  .tabsw button.on,.mini.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .calc td{padding:3px 6px;font-size:12.5px;border-bottom:1px dashed var(--line)} .calc td.v{text-align:right;font-family:"IBM Plex Mono",monospace}
+  .calc tr.step td{color:var(--muted)} .calc tr.tot td{font-weight:600;border-top:1px solid var(--line)}
+  .calc tr.relief td{color:var(--green)}
   .rule{border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:13.5px}
   .rule .rt{font-weight:600;color:var(--brand-dark)} .rule .rs{font-size:11.5px;color:var(--muted);margin-top:4px}
   .rule .sc{float:right;font-size:11px;color:var(--muted)}
@@ -187,13 +198,15 @@
       <div class="actions"><button onclick="load()">↻ Sync with PayPal</button></div></div>
     <div class="card hero">
       <div class="hero-grid">
-        <div><div class="label">Estimated income tax this year</div>
-          <div class="big num" id="taxBig">₹—</div><div class="compare" id="taxCompare">Loading your books…</div></div>
+        <div><div class="label">Income tax this year</div>
+          <div class="big num" id="taxBig">₹—</div><div class="compare" id="taxCompare">Loading your books…</div>
+          <div style="margin-top:10px"><a onclick="go('tax')" style="cursor:pointer;color:var(--gold);font-weight:600">View tax details →</a></div></div>
         <div class="side">
-          <div>📈 Projected receipts: <b class="num" id="projected">—</b></div>
-          <div>🪙 Set aside: <b id="setAside">—</b> of every payment</div>
-          <div>📅 <span id="deadline">—</span></div>
-          <div>🧾 GST: <b id="gstLine">—</b></div>
+          <div class="hrow"><span>Expected earnings</span><b class="num" id="projected">—</b></div>
+          <div class="hrow"><span>Keep aside</span><b id="setAside">—</b></div>
+          <div class="hrow"><span>Payment due</span><b id="deadline">—</b></div>
+          <div class="hrow"><span>Tax saved</span><b class="num" id="saved">—</b></div>
+          <div class="hrow"><span>GST</span><b id="gstLine">—</b></div>
         </div>
       </div>
     </div>
@@ -242,14 +255,26 @@
 
   <!-- TAX -->
   <section class="page" id="p-tax">
-    <div class="ph"><div><h2>Tax</h2><p>Deterministic calculator (Income Tax Act 2025, new regime). The AI explains it but never computes the numbers.</p></div>
-      <div class="actions"><button class="primary" onclick="ask('Explain my tax estimate and how much I should set aside')">Ask the Tax advisor</button></div></div>
+    <div class="ph"><div><h2>Tax</h2><p>Calculated under India's Income-tax Act 2025 (new regime) by a tested calculator. Ask the Tax advisor for a step-by-step walkthrough.</p></div>
+      <div class="actions"><button class="primary" onclick="ask('Explain step by step how my income tax is calculated')">Ask the Tax advisor</button></div></div>
     <div class="row2">
-      <div class="card"><h3>Presumptive vs regular <small id="ftype"></small></h3>
-        <table class="compare-tbl"><tbody id="taxCompareTbl"></tbody></table>
-        <p class="muted" style="font-size:12.5px;margin:10px 0 0" id="taxDeadline2"></p></div>
-      <div class="card"><h3>Assumptions</h3><div class="scroll" style="max-height:190px"><ul class="assume" id="assumptions"></ul></div>
-        <p class="muted" style="font-size:12.5px;margin:8px 0 0">Estimate only. Confirm with a CA before filing.</p></div>
+      <div class="card"><h3>How your tax is calculated <small id="ftype"></small></h3>
+        <div class="scroll"><table class="compare-tbl"><tbody id="taxCompareTbl"></tbody></table></div>
+        <p class="muted" style="font-size:12.5px;margin:8px 0 0" id="taxDeadline2"></p></div>
+      <div class="card"><h3>Step-by-step working <small>for you or your CA</small></h3>
+        <div id="detailsClosed">
+          <p class="muted" style="margin:0 0 12px">Every step from your earnings to the final figure: tax slabs, rebate or relief, cess and TDS, plus the assumptions used. Produced by the calculator, not the AI.</p>
+          <button class="primary" onclick="openDetails(true)">Show step-by-step</button>
+        </div>
+        <div id="detailsOpen" style="display:none;flex-direction:column;min-height:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="tabsw"><button class="on" data-t="calc">Steps</button><button data-t="assume">Assumptions</button></span>
+            <span id="calcPick" style="margin-left:auto"><button class="mini on" data-m="presumptive">Presumptive</button><button class="mini" data-m="regular">Regular</button></span>
+          </div>
+          <div class="scroll" style="max-height:270px" id="calcBox"></div>
+          <div class="scroll" style="max-height:270px;display:none" id="assumeBox"><ul class="assume" id="assumptions"></ul></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0">Estimate only. Confirm with a CA before filing. <a onclick="openDetails(false)" style="cursor:pointer;color:var(--brand)">Hide</a></p>
+        </div></div>
     </div>
     <div class="card grow"><h3>📚 Tax rules library <small>RAG · the same passages the Tax advisor retrieves and cites</small></h3>
       <form id="rulesForm" style="display:flex;gap:8px;margin-bottom:10px">
@@ -338,15 +363,20 @@ const daysTo = d => d ? Math.round((new Date(d) - new Date(new Date().toDateStri
 function render(s){
   const t=s.tax;
   $('fy').textContent='FY '+t.financial_year; $('fx').textContent='$1 = ₹'+s.usd_inr;
-  $('taxBig').textContent=inr(t.estimated_annual_tax_inr);
+  const toPay = t.tax_after_tds_inr ?? t.estimated_annual_tax_inr;
+  $('taxBig').textContent=inr(toPay);
   const saves = t.tax_if_regular_inr - (t.tax_if_presumptive_inr ?? t.tax_if_regular_inr);
-  $('taxCompare').innerHTML = (t.recommended==='presumptive' && saves>0)
-    ? `with the <b>presumptive scheme</b> (Sec 58), vs <b>${inr(t.tax_if_regular_inr)}</b> the regular way. You save <b>${inr(saves)}</b>.`
-    : `Recommended: <b>${t.recommended}</b> method (new regime).`;
+  const share = t.freelancer_type==='business' ? 'only 6% of what you earn' : 'only half of what you earn';
+  $('taxCompare').innerHTML = (toPay===0 ? 'Nothing to pay' : 'Left to pay') +
+    (t.tds_credit_inr ? ` · after ${inr(t.tds_credit_inr)} TDS credit` : '') + ` · FY ${esc(t.financial_year)}`;
+  $('saved').textContent = saves>0 ? inr(saves) : '—';
   $('projected').textContent=inr(t.projected_annual_receipts_inr);
-  $('setAside').textContent=t.set_aside_percent_of_each_payment+'%';
-  $('deadline').textContent=t.advance_tax_deadline;
-  const g=s.gst||{}; $('gstLine').textContent = (g.status||'—') + (g.projected_turnover_inr?` (${inr(g.projected_turnover_inr)} of ₹20L)`:'');
+  $('setAside').textContent = t.set_aside_percent_of_each_payment ? `${t.set_aside_percent_of_each_payment}% of each payment` : 'Nothing';
+  const dm = (t.advance_tax_deadline||'').match(/(\d{1,2}) (\w{3})\w* (\d{4})/);
+  $('deadline').textContent = /No advance tax/.test(t.advance_tax_deadline) ? 'None due' :
+     t.recommended==='presumptive' && dm ? `${dm[1]} ${dm[2]} ${dm[3]}` : 'Quarterly instalments';
+  const g=s.gst||{}; $('gstLine').textContent = ({"must register":"Registration required","likely to cross this year":"Registration likely this year",
+     "approaching":"Nearing ₹20L threshold","below threshold":"Not required"})[g.status]||'—';
   const bt=s.by_client_type||{}; $('split').textContent = `🌍 Foreign ${inr(bt.foreign)} · 🇮🇳 Indian clients ${inr(bt.domestic)}` + (s.tds_credit_inr?` · TDS credit ${inr(s.tds_credit_inr)}`:'');
   const nr=(s.needs_review||[]).length; $('navReview').textContent=nr; $('navReview').style.display=nr?'inline':'none';
   $('kReceived').textContent=inr(s.received_inr); $('kPending').textContent=inr(s.pending_inr);
@@ -381,15 +411,21 @@ function render(s){
       <td><button onclick="ask('Send a payment reminder for invoice ${esc(i.invoice_id)}')">Remind</button></td></tr>`).join('')
     : '<tr><td colspan="5" class="empty">Nothing to chase right now.</td></tr>';
 
-  const rows=[['Presumptive (50% of receipts)', t.tax_if_presumptive_inr, 'presumptive'], ['Regular (receipts − expenses)', t.tax_if_regular_inr, 'regular']];
-  $('taxCompareTbl').innerHTML = `<tr><td>Receipts so far</td><td class="v num">${inr(t.receipts_so_far_inr)}</td></tr>
-    <tr><td>Projected for the year</td><td class="v num">${inr(t.projected_annual_receipts_inr)}</td></tr>` +
-    rows.map(([l,v,k])=>`<tr class="${t.recommended===k?'best':''}"><td>${l}${t.recommended===k?' ✓ recommended':''}</td><td class="v num">${v==null?'not eligible':inr(v)}</td></tr>`).join('') +
-    (t.tds_credit_inr ? `<tr><td>− TDS already deducted by Indian clients</td><td class="v num">${inr(t.tds_credit_inr)}</td></tr>
-      <tr class="best"><td>Still to pay</td><td class="v num">${inr(t.tax_after_tds_inr)}</td></tr>` : '');
+  const c0=t.calculation||{}, pr=c0.presumptive, rg=c0.regular;
+  const rate = Math.round((t.presumptive_rate||0.5)*100);
+  $('taxCompareTbl').innerHTML = `<tr><td>Earned so far this year</td><td class="v num">${inr(t.receipts_so_far_inr)}</td></tr>
+    <tr><td>Expected for the full year</td><td class="v num">${inr(t.projected_annual_receipts_inr)}</td></tr>
+    <tr class="${t.recommended==='presumptive'?'best':''}"><td>Simplified method: tax on ${rate}% of earnings${pr?` (${inr(pr.taxable_income)})`:''}${t.recommended==='presumptive'?' ✓ used':''}</td>
+      <td class="v num">${t.tax_if_presumptive_inr==null?'not eligible':inr(t.tax_if_presumptive_inr)}</td></tr>
+    <tr class="${t.recommended==='regular'?'best':''}"><td>Normal method: tax on earnings minus expenses${rg?` (${inr(rg.taxable_income)})`:''}${t.recommended==='regular'?' ✓ used':''}</td>
+      <td class="v num">${inr(t.tax_if_regular_inr)}</td></tr>` +
+    (t.tds_credit_inr ? `<tr><td>Less TDS already deducted by clients</td><td class="v num">− ${inr(t.tds_credit_inr)}</td></tr>` : '') +
+    `<tr class="best"><td>Left to pay</td><td class="v num">${inr(t.tax_after_tds_inr ?? t.estimated_annual_tax_inr)}</td></tr>`;
   $('taxDeadline2').textContent='📅 '+t.advance_tax_deadline;
-  $('ftype').textContent = t.freelancer_type==='business' ? 'business scheme · 6%' : 'specified profession · 50%';
+  $('ftype').textContent = t.freelancer_type==='business' ? 'business scheme' : 'specified profession';
   $('assumptions').innerHTML=(t.assumptions||[]).map(a=>`<li>${esc(a)}</li>`).join('');
+
+  renderCalc();
 
   $('entries').innerHTML = s.entries.length ? s.entries.map(e=>{ const dup=!!e.duplicate_of, fee=e.entry_type==='fee';
     const pending = e.needs_review && e.included==null, excluded = e.included===0;
@@ -421,6 +457,33 @@ async function loadAudit(){
     }).join('') : '<tr><td colspan="5" class="empty">No approvals yet.</td></tr>';
   }catch(e){}
 }
+
+// ---------- tax working (from the calculator) ----------
+let calcMode='presumptive';
+function renderCalc(){
+  if(!S) return; const t=S.tax, c=t.calculation||{}; let m=c[calcMode];
+  if(!c.regular){ $('calcBox').innerHTML='<div class="empty">The step-by-step working needs the latest tax.py on the server. Update the project files and restart the server.</div>'; return; }
+  if(!m){ $('calcBox').innerHTML='<div class="empty">The simplified method isn\'t available: expected earnings are above its ₹75 lakh limit.</div>'; return; }
+  const pct=r=>Math.round(r*100)+'%';
+  $('calcBox').innerHTML = `<table class="calc"><tbody>
+    <tr class="step"><td colspan="2">1. Projected receipts: <b class="num">${esc(c.projection)}</b></td></tr>
+    <tr class="step"><td colspan="2">2. Taxable income: <b class="num">${esc(m.deemed_income)}</b></td></tr>
+    ${m.slabs.map(l=>`<tr><td>&nbsp;&nbsp;${esc(l.slab)} at ${pct(l.rate)} on ${inr(l.income_in_slab)}</td><td class="v">${inr(l.tax)}</td></tr>`).join('')}
+    <tr class="tot"><td>3. Slab tax</td><td class="v">${inr(m.slab_tax)}</td></tr>
+    ${m.relief?`<tr class="relief"><td>4. ${esc(m.relief)}</td><td class="v">${inr(m.tax_after_relief)}</td></tr>`:''}
+    <tr><td>${m.relief?'5':'4'}. + 4% health & education cess</td><td class="v">${inr(m.cess)}</td></tr>
+    <tr class="tot"><td>Tax for the year</td><td class="v">${inr(m.total)}</td></tr>
+    ${calcMode===t.recommended && t.tds_credit_inr?`<tr><td>− TDS already deducted</td><td class="v">${inr(t.tds_credit_inr)}</td></tr>
+      <tr class="tot"><td>Still to pay</td><td class="v">${inr(t.tax_after_tds_inr)}</td></tr>`:''}
+  </tbody></table>`;
+}
+document.querySelectorAll('#calcPick .mini').forEach(b=>b.onclick=()=>{ calcMode=b.dataset.m;
+  document.querySelectorAll('#calcPick .mini').forEach(x=>x.classList.toggle('on',x===b)); renderCalc(); });
+document.querySelectorAll('.tabsw button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabsw button').forEach(x=>x.classList.toggle('on',x===b));
+  const t=b.dataset.t; $('calcBox').style.display=t==='calc'?'':'none';
+  $('assumeBox').style.display=t==='assume'?'':'none'; $('calcPick').style.visibility=t==='calc'?'visible':'hidden'; });
+function openDetails(open){ $('detailsClosed').style.display=open?'none':''; $('detailsOpen').style.display=open?'flex':'none'; }
 
 // ---------- RAG rules library ----------
 async function searchRules(q){

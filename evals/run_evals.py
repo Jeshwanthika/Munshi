@@ -118,6 +118,13 @@ def suite_a():
     big = tax.estimate(6_000_000, 0, today=nov)       # projects to 90L > 75L limit
     check("A", "above ₹75L: presumptive not eligible", big["presumptive_eligible"] is False and big["recommended"] == "regular", big)
     check("A", "assumptions are reported", len(e.get("assumptions", [])) >= 4)
+    w = tax.estimate(1_665_131, 99_100, today=date(2026, 11, 11), tds_inr=9000)
+    pw = w["calculation"]["presumptive"]
+    check("A", "working: marginal relief case reproduces ₹50,802",
+          pw["slab_tax"] == 67_327 and pw["tax_after_relief"] == 48_848 and pw["total"] == 50_802 == w["estimated_annual_tax_inr"], pw)
+    check("A", "working: slab lines add up to slab tax", sum(l["tax"] for l in pw["slabs"]) == pw["slab_tax"])
+    check("A", "working: regular method matches", w["calculation"]["regular"]["total"] == w["tax_if_regular_inr"] == 298_752)
+    check("A", "Indian number format", tax.inr(2_497_696) == "₹24,97,696" and tax.inr(12_345_678) == "₹1,23,45,678")
 
 
 # ================================================================ B. Guardrails & enforcement
@@ -249,6 +256,7 @@ ROUTING = [
     ("Bill Rahul Designs in Bangalore ₹38,000 for a logo pack", "billing"),
     ("Is the ₹5,000 UPI from Priya counted as income?", "statement"),
     ("How much TDS have my Indian clients deducted?", "tax"),
+    ("Can you give me the split up for the platform fee 99100?", "statement"),
 ]
 
 
@@ -350,6 +358,28 @@ def suite_e():
         check("E", "Indian client: no PayPal invoice attempted", not r["pending"] and sent == 0, r["trace"])
         check("E", "Indian client: explains + offers UPI request", "paypal" in reply and "upi" in reply, reply[:200])
     pace(); safe("E", "indian client", e9)
+
+    def e11():
+        tid, r, sent = _run("Who hasn't paid me yet?")
+        reply = (r["reply"] or "")
+        check("E", "'who hasn't paid' answers with names, no reminder card",
+              not r["pending"] and sent == 0 and "Nordwind" in reply, reply[:200])
+    pace(); safe("E", "who hasn't paid", e11)
+
+    def e12():
+        tid, r, sent = _run("How much tax will I owe this year?")
+        reply = (r["reply"] or "").lower()
+        jargon = [w for w in ("marginal relief", "cess", "slab") if w in reply]
+        check("E", "default tax answer is plain (no jargon)", not jargon, jargon)
+    pace(); safe("E", "plain tax", e12)
+
+    def e10():
+        tid, r, sent = _run("Show me step by step how my income tax is worked out.")
+        reply = (r["reply"] or "").replace(",", "")
+        exp = ledger.summary()["tax"]
+        check("E", "explains tax using the calculator's working",
+              "get_income_and_tax" in _tools_used(r) and str(exp["estimated_annual_tax_inr"]) in reply, reply[:200])
+    pace(); safe("E", "tax working", e10)
 
     def e8():
         tid, r, sent = _run(None, autopilot=True)
